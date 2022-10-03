@@ -4,6 +4,8 @@ require "Mapping"
 
 require "Util.Counter"
 require "Util.Utils"
+require "Util.FSM.FSMManager"
+require "Util.FSM.FSMState"
 
 require "Config.ConfigManager"
 
@@ -14,8 +16,15 @@ require "SDK.SDKModel"
 require "View.Base.ViewBase"
 require "View.Base.ViewManager"
 require "View.Base.ViewUtils"
-
 require "View.BattleUI"
+
+require "Battle.BattleManager"
+require "Battle.State.BattleStartState"
+require "Battle.State.RoundStartState"
+require "Battle.State.RoundState"
+require "Battle.State.RoundEndState"
+require "Battle.State.BattleEndState"
+
 
 local isPaused = false
 local isEditor = false
@@ -35,7 +44,8 @@ function OnSceneLoad(sceneIndex, sceneName)
     ViewManager:Init(sceneIndex, sceneName)
     ConfigManager:Init()
 
-    BattleUI:Create()
+    local battleConfig = ConfigManager:GetConfig("TestBattle")
+    BattleManager:Create(battleConfig)
     print("OnSceneLoad:" .. sceneName)
 end
 

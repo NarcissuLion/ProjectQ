@@ -15,7 +15,6 @@ end
 
 function BattleUI:Init()
     self.root = self:Add("Prefab/UI/Battle/BattleUI")
-
 end
 
 function BattleUI:OnClickButton()

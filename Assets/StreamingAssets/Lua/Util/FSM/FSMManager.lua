@@ -7,11 +7,11 @@
 FSMManager = {}
 FSMManager.__index = FSMManager
 
-function FSMManager.Create(cat)
+function FSMManager.Create(battle)
     local copy = {}
     setmetatable(copy, FSMManager)
     copy.__index = FSMManager
-    copy:Init(cat)
+    copy:Init(battle)
     return copy
 end
 
