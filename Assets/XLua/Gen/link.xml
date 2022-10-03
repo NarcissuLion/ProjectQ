@@ -1,0 +1,62 @@
+﻿
+
+<linker>
+
+	<assembly fullname="UnityEngine.CoreModule">
+	    <type fullname="UnityEngine.Application" preserve="all"/>
+		<type fullname="UnityEngine.Screen" preserve="all"/>
+		<type fullname="UnityEngine.SystemInfo" preserve="all"/>
+		<type fullname="UnityEngine.SleepTimeout" preserve="all"/>
+		<type fullname="UnityEngine.GameObject" preserve="all"/>
+		<type fullname="UnityEngine.Transform" preserve="all"/>
+		<type fullname="UnityEngine.RectTransform" preserve="all"/>
+		<type fullname="UnityEngine.Sprite" preserve="all"/>
+		<type fullname="UnityEngine.Texture" preserve="all"/>
+		<type fullname="UnityEngine.Material" preserve="all"/>
+		<type fullname="UnityEngine.MeshRenderer" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine.UI">
+	    <type fullname="UnityEngine.UI.Text" preserve="all"/>
+		<type fullname="UnityEngine.UI.Image" preserve="all"/>
+		<type fullname="UnityEngine.UI.RawImage" preserve="all"/>
+		<type fullname="UnityEngine.UI.ScrollRect" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="Assembly-CSharp">
+	    <type fullname="CommonUtil" preserve="all"/>
+		<type fullname="GameUtil" preserve="all"/>
+		<type fullname="ResourcesLoader" preserve="all"/>
+		<type fullname="CoroutineHelper" preserve="all"/>
+		<type fullname="DebugStopwatch" preserve="all"/>
+		<type fullname="HttpManager" preserve="all"/>
+		<type fullname="GridView" preserve="all"/>
+		<type fullname="HotfixDownloader" preserve="all"/>
+		<type fullname="HotfixManager" preserve="all"/>
+		<type fullname="HotfixUtil" preserve="all"/>
+		<type fullname="SceneHandler" preserve="all"/>
+		<type fullname="LuaDebugger" preserve="all"/>
+		<type fullname="ConfigManager" preserve="all"/>
+		<type fullname="TextConfig" preserve="all"/>
+		<type fullname="SDKInterface" preserve="all"/>
+		<type fullname="SDKDefault" preserve="all"/>
+		<type fullname="SDKAndroid" preserve="all"/>
+		<type fullname="SDKIOS" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="DOTween">
+	    <type fullname="DG.Tweening.ShortcutExtensions" preserve="all"/>
+		<type fullname="DG.Tweening.Tweener" preserve="all"/>
+		<type fullname="DG.Tweening.Ease" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="DOTween46">
+	    <type fullname="DG.Tweening.ShortcutExtensions46" preserve="all"/>
+		
+	</assembly>
+
+</linker>

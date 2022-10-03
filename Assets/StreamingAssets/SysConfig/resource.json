@@ -1,0 +1,26 @@
+{
+	"_comment": [
+		"共用资源，常驻内存，可以是文件/文件夹全名，或前缀。如果一个预设是Common，则其用到的资源无视标记也会自动成为Common。",
+		"缓存池，配置X组缓存池，每组包含Y个路径前缀，同一组共享一个缓存上限"
+	],
+	"common": [
+		"Resources/Audio",
+		"Resources/Font",
+		"Resources/Material",
+		"Resources/Shader",
+		"Resources/Prefab/UI/Common"
+	],
+	"cacheGroup": {
+		"icon": 200,
+		"flag": 30
+	},
+	"cachePool": {
+		"icon": [
+			"Prefab/Icon/avatar",
+			"Prefab/Icon/resource"
+		],
+		"flag": [
+			"Prefab/Icon/national_flag"
+		]
+	}
+}

@@ -1,0 +1,1 @@
+使用时请把"GoogleSDK"类中的base64EncodedPublic换成自己游戏的公钥
