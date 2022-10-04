@@ -6,7 +6,7 @@ function BattleEndState:Create(battle)
     local copy = FSMState:Create()
     setmetatable(copy, self)
     copy.battle = battle
-    copy.id = BattleState.BattleStart
+    copy.id = BattleState.BattleEnd
 
     return copy
 end

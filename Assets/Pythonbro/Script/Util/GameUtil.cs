@@ -439,6 +439,7 @@ public static class GameUtil {
     // 加载预设上的Sprite，并不创建预设实例
     public static Sprite LoadPrefabSprite(string path) {
         GameObject prefab = LoadPrefab(path);
+
         if (prefab == null) {
             return null;
         }

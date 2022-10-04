@@ -1895,6 +1895,9 @@
     <Reference Include="DOTween43">
       <HintPath>Assets\Plugins\Demigiant\DOTween\DOTween43.dll</HintPath>
     </Reference>
+    <Reference Include="LitJson">
+      <HintPath>Assets\LitJson.dll</HintPath>
+    </Reference>
     <Reference Include="netstandard">
       <HintPath>D:\UnityHub\2021.3.11f1c1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>
     </Reference>

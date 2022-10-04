@@ -2301,6 +2301,15 @@ public static class CommonUtil {
         return text;
     }
 
+    public static void WriteToUTF8(string path, string target)
+    {
+        UTF8Encoding end = new UTF8Encoding(false);
+        using (StreamWriter sw = new StreamWriter(path, false, end))
+        {
+            sw.Write(target);
+        }
+    }
+
     /// <summary>
     /// Trim both side
     /// </summary>

@@ -6,6 +6,7 @@ require "Util.Counter"
 require "Util.Utils"
 require "Util.FSM.FSMManager"
 require "Util.FSM.FSMState"
+require "Util.ImageLoader"
 
 require "Config.ConfigManager"
 

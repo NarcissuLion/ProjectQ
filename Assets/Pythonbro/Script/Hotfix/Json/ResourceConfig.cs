@@ -23,11 +23,11 @@ public class ResourceConfig {
     }
 
     public string GetCacheGroup(string assetPath) {
-        if(cacheGroup == null) {
+        if (cacheGroup == null) {
             return null;
         }
 
-        foreach(KeyValuePair<string, List<string>> pair in cachePool) {
+        foreach (KeyValuePair<string, List<string>> pair in cachePool) {
             foreach (string path in pair.Value) {
                 if (assetPath.StartsWith(path, System.StringComparison.OrdinalIgnoreCase)) {
                     return pair.Key;

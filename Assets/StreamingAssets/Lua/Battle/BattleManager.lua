@@ -7,7 +7,7 @@ BattleState.BattleStart = 1
 BattleState.RoundStart = 2
 BattleState.Round = 3
 BattleState.RoundEnd = 4
-BattleState.BattleEnd = 4
+BattleState.BattleEnd = 5
 
 function BattleManager:Create(config)
     local copy = {}
@@ -18,13 +18,12 @@ function BattleManager:Create(config)
 end
 
 function BattleManager:Init(config)
+    self.config = config
+    self.view = BattleUI:Create()
     local battle = {}
-    battle.config = config
     battle.state = BattleState.BattleStart
-    battle.view = BattleUI:Create()
     self:InitState(battle)
     self.fsmManager:Start()
-    self:ChangeState(BattleState.BattleStart)
 end
 
 function BattleManager:InitState(battle)

@@ -3,6 +3,8 @@ using UnityEngine;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
+using LitJson;
+using System.Text;
 
 public class JsonUtil {
 
@@ -205,6 +207,15 @@ public class JsonUtil {
         return defaultValue;
     }
 
-
+    //litjson 使用
+    public static void WriteJson(string path, JsonData json, bool prettyPrint = false)
+    {
+        StringBuilder buff = new StringBuilder();
+        LitJson.JsonWriter writer = new LitJson.JsonWriter(buff);
+        writer.PrettyPrint = prettyPrint;
+        json.ToJson(writer);
+        CommonUtil.WriteToUTF8(path, buff.ToString().Trim());
+        //File.WriteAllText(path, buff.ToString().Trim(), Encoding.UTF8);
+    }
 
 }

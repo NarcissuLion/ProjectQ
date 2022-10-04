@@ -16,8 +16,7 @@
 	},
 	"cachePool": {
 		"icon": [
-			"Prefab/Icon/avatar",
-			"Prefab/Icon/resource"
+			"Prefab/UI"
 		],
 		"flag": [
 			"Prefab/Icon/national_flag"

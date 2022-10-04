@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 
@@ -196,5 +197,79 @@ public static class ResourcesLoader  {
         }
     }
     */
+    public static T Load<T>(string path) where T : Object
+    {
+        T obj = (T)LoadFromResource(path, typeof(T).FullName);
+        return obj;
+    }
+    public static Object Load(string path, System.Type type)
+    {
+        Object obj = (Object)LoadFromResource(path, type.FullName);
+        return obj;
+    }
 
+
+    /*
+     * 使用类型反射加载类，类型需要使用带命名空间的类名
+     */
+    private static Assembly[] AssumblyList = {
+            Assembly.Load("UnityEngine"),
+            Assembly.Load("UnityEngine.UI"),
+            Assembly.GetExecutingAssembly()
+        };
+
+    public static System.Type GetAssemblyType(string resType)
+    {
+        System.Type type = null;
+        foreach (var assembly in AssumblyList)
+        {
+            type = assembly.GetType(resType);
+            if (null != type)
+            {
+                break;
+            }
+        }
+        return type;
+    }
+
+    public static System.Object LoadFromResource(string path, string resType)
+    {
+        Debug.Log("!!!!!!!!");
+        System.Type type = GetAssemblyType(resType);
+        if (type == null)
+        {
+            Debug.LogError("Can not find type:" + resType);
+            return null;
+        }
+        var obj = Resources.Load(path, type);
+#if UNITY_EDITOR
+        if (obj == null)
+        {
+            obj = LoadAssetAtPath(
+                string.Format("Assets/Res/{0}", path)
+                , type);
+        }
+#endif
+        return obj;
+    }
+
+#if UNITY_EDITOR
+    static string[] ext = { ".jpg", ".png", ".json", ".txt", ".prefab", ".mat"
+                , ".tga", ".mp3", ".anim", ".controller", ".wav", ".ttf" , ".otf"
+                , ".fbx", ".shader", ".mp4", ".asset"};
+    private static Object LoadAssetAtPath(string path, System.Type type)
+    {
+
+        Object obj = null;
+        foreach (var i in ext)
+        {
+            obj = UnityEditor.AssetDatabase.LoadAssetAtPath(path + i, type);
+            if (obj != null)
+            {
+                return obj;
+            }
+        }
+        return obj;
+    }
+#endif
 }
