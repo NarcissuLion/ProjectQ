@@ -1,0 +1,74 @@
+{
+"a1":{
+	"typ":"atk",
+	"name":"攻击1",
+	"pos":[1,2],
+	"atkPos":[1,2],
+	"dmg":[90,100],
+	"range":"one"
+},
+"a2":{
+	"typ":"atk",
+	"name":"攻击2",
+	"pos":[3,4],
+	"atkPos":[3,4],
+	"dmg":[90,100],
+	"range":"one"
+},
+"a3":{
+	"typ":"atk",
+	"name":"攻击3",
+	"pos":[1,2],
+	"atkPos":[1,2],
+	"dmg":[10,20],
+	"range":"aoe"
+},
+"a4":{
+	"typ":"atk",
+	"name":"攻击4",
+	"pos":[1,2,3,4],
+	"atkPos":[1,2,3,4],
+	"dmg":[40,60],
+	"range":"aoe"
+},
+"a5":{
+	"typ":"atk",
+	"name":"攻击5",
+	"pos":[1,2],
+	"atkPos":[3,4],
+	"dmg":[70,80],
+	"range":"one"
+},
+"a6":{
+	"typ":"atk",
+	"name":"攻击6",
+	"pos":[3,4],
+	"atkPos":[1,2],
+	"dmg":[70,80],
+	"range":"one"
+},
+"c1":{
+	"typ":"cure",
+	"name":"治疗1",
+	"pos":[3,4],
+	"atkPos":[1,2,3,4],
+	"dmg":[20,30],
+	"range":"one"
+},
+"c2":{
+	"typ":"cure",
+	"name":"治疗2",
+	"pos":[1,2,3,4],
+	"atkPos":0,
+	"dmg":[10,30],
+	"range":"own"
+},
+"c3":{
+	"typ":"cure",
+	"name":"治疗3",
+	"pos":[1,2,3,4],
+	"atkPos":[1,2,3,4],
+	"dmg":[5,10],
+	"range":"aoe"
+}
+}

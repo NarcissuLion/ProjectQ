@@ -234,7 +234,6 @@ public static class ResourcesLoader  {
 
     public static System.Object LoadFromResource(string path, string resType)
     {
-        Debug.Log("!!!!!!!!");
         System.Type type = GetAssemblyType(resType);
         if (type == null)
         {

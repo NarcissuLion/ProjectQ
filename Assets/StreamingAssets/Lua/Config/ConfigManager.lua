@@ -5,8 +5,9 @@
 ConfigManager = {}
 
 local files = {
-	"TestBattle",
-    "Character"
+    "TestBattle",
+    "Character",
+    "Skill",
 }
 
 local sysFiles = {

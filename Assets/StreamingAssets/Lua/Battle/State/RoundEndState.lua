@@ -13,7 +13,7 @@ end
 
 function RoundEndState:OnEnter()
     print(self.battle.roundIndex .. "回合结束")
-    if self.battle.roundIndex > 3 then
+    if self.battle.roundIndex > 1 then
         self.battle:ChangeState(BattleState.BattleEnd)
     end
     
