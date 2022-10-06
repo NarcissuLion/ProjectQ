@@ -48,53 +48,57 @@ function RoundState:DoOwn(charData)
     --显示信息
     self.battle.view:SetOwnInfo(charData)
     self.battle.view:SetCharSelect(true , charData.pos , "Select")
-
+    print("自己" .. charData.pos)
     ------
-    -- AsyncCall(function ()
+    AsyncCall(function ()
         self:Pass()
-    -- end , 1)
+    end , 1)
 end
 
 function RoundState:DoEnemy(charData)
+    print("敌人" .. charData.pos)
     self.battle.view:SetCharSelect(false , charData.pos , "Select")
     local skillId = self:RandomEnemyAction(charData)
     if skillId ~= nil then
+        print("使用技能id:" .. skillId)
         local isOwn ,pos = self:RandomAtkPos(skillId , charData.pos)
         if type(pos) == "number" then
             -- 选中对象
             self.battle.view:SetCharSelect(isOwn , pos ,"Selected" )
             local dmg = self:GetDmg(charData , skillId)
+            print("选中对象".. pos)
             -- 等1s
-            -- AsyncCall(function ()
+            AsyncCall(function ()
                 -- 显示伤害
-                print(dmg)
+                self.battle.view:ShowDamage(isOwn , pos , dmg)
                 -- 扣血，刷新界面ui
                 self.battle:AddCharHp(isOwn ,pos , dmg)
                 self.battle.view:RefreshChar(self.battle:GetCharByPos(isOwn , pos))
-                -- AsyncCall(function ()
+                AsyncCall(function ()
                     self:Pass()
-            --     end , 1)
-            -- end , 1)
+                end , 1)
+            end , 1)
         else
             for index, p in ipairs(pos) do
                 -- 选中对象
                 self.battle.view:SetCharSelect(isOwn , p ,"Selected" )
+                print("选中对象"..  p)
             end
             
             -- 等1s
-            -- AsyncCall(function ()
+            AsyncCall(function ()
                 for index, p in ipairs(pos) do
                     local dmg = self:GetDmg(charData , skillId)                
                     -- 显示伤害
-                    print(dmg)
+                    self.battle.view:ShowDamage(isOwn , p , dmg)
                     -- 扣血，刷新界面ui
                     self.battle:AddCharHp(isOwn ,p , dmg)
                     self.battle.view:RefreshChar(self.battle:GetCharByPos(isOwn , p))
                 end
-                -- AsyncCall(function ()
+                AsyncCall(function ()
                     self:Pass()
-                -- end , 1)
-            -- end , 1)
+                end , 1)
+            end , 1)
         end
     else
         --跳过或者移动
@@ -104,6 +108,7 @@ end
 function RoundState:Pass()
     table.remove(self.battle.sortBattleList,1)
     self.battle.view:SetCharSelectOff()
+    print("============")
     self:DoNext()
 end
 

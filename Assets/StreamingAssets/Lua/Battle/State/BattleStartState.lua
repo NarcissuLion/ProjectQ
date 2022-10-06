@@ -14,6 +14,8 @@ end
 function BattleStartState:OnEnter()
     print("进入战斗")
     self:AddPlayer()
+    self.battle.view:SetOwnInfo()
+    self.battle.view:SetEnemyInfo()
     self.battle:ChangeState(BattleState.RoundStart)
 end
 

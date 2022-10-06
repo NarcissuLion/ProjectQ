@@ -8,5 +8,6 @@ GameObject 		= CS.UnityEngine.GameObject
 CommonUtil 		= CS.CommonUtil
 GameUtil 		= CS.GameUtil
 
+CoroutineHelper = CS.CoroutineHelper
 
 --endregion
