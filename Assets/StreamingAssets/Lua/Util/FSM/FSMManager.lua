@@ -39,3 +39,8 @@ end
 function FSMManager:Update()
      self.fsmManager[self.target.state]:Update()
 end
+
+-- 这个不该这么写，之后引入消息机制用消息驱动
+function FSMManager:OwnUseSkill(skillIndex,uuid)
+    self.fsmManager[self.target.state]:OwnUseSkill(skillIndex,uuid)
+end

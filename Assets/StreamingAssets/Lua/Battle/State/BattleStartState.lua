@@ -54,7 +54,7 @@ function BattleStartState:AddPlayer()
                     self.battle.own[uuid].atk = charData.atk
                     self.battle.own[uuid].spd = charData.spd
                     self.battle.own[uuid].skill = charData.skill
-                    self.battle.view:CreatePlayer(true , pos , charData)
+                    self.battle.view:CreatePlayer(true , pos , self.battle.own[uuid])
                     uuid = uuid + 1
                 end
             end
@@ -73,7 +73,7 @@ function BattleStartState:AddPlayer()
                     self.battle.enemy[uuid].atk = charData.atk
                     self.battle.enemy[uuid].spd = charData.spd
                     self.battle.enemy[uuid].skill = charData.skill
-                    self.battle.view:CreatePlayer(false , pos , charData)
+                    self.battle.view:CreatePlayer(false , pos , self.battle.enemy[uuid])
                     uuid = uuid + 1
                 end
             end

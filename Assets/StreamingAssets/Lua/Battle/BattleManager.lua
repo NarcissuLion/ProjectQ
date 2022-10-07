@@ -19,15 +19,16 @@ end
 
 function BattleManager:Init(config)
     self.config = config
-    self.view = BattleUI:Create()
-    local battle = {}
-    battle.state = BattleState.BattleStart
-    self:InitState(battle)
+    self.view = BattleUI:Create(self)    
+    self.state = BattleState.BattleStart
+
+    self.ownTurn = false
+    self:InitState()
     self.fsmManager:Start()
 end
 
-function BattleManager:InitState(battle)
-    self.fsmManager = FSMManager.Create(battle)
+function BattleManager:InitState()
+    self.fsmManager = FSMManager.Create(self)
     self.fsmManager:AddState(BattleStartState:Create(self))
     self.fsmManager:AddState(RoundStartState:Create(self))
     self.fsmManager:AddState(RoundState:Create(self))
@@ -93,15 +94,30 @@ function BattleManager:AddCharHp(isOwn ,pos , hp)
     if isOwn then
         for uuid, data in pairs(self.own) do
             if data.pos == pos then
-                self.own[uuid].hp = self.own[uuid].hp + hp
+                local maxHp = self:GetCharMaxHp(data.uid)
+                self.own[uuid].hp = math.max(0,math.min(self.own[uuid].hp + hp , maxHp))
+                if self.own[uuid].hp == 0 then
+                    self.own[uuid].isDead = true
+                end
             end
         end
     else
         for uuid, data in pairs(self.enemy) do
             if data.pos == pos then
-                self.enemy[uuid].hp = self.enemy[uuid].hp + hp
+                local maxHp = self:GetCharMaxHp(data.uid)
+                self.enemy[uuid].hp = math.max(0,math.min(self.enemy[uuid].hp + hp , maxHp))
+                if self.enemy[uuid].hp == 0 then
+                    self.enemy[uuid].isDead = true
+                end
             end
         end
+    end
+end
+
+function BattleManager:UseSkillToChar(skillIndex,uuid)
+    if self.state == BattleState.Round then
+        self.fsmManager:OwnUseSkill(skillIndex,uuid)
+        self.view:SetSkillSelect()
     end
 end
 
