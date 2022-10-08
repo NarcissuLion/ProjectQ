@@ -31,7 +31,7 @@ namespace XLua.CSObjectWrap
 			Utils.EndObjectRegister(type, L, translator, null, null,
 			    null, null, null);
 
-		    Utils.BeginClassRegister(type, L, __CreateInstance, 21, 30, 3);
+		    Utils.BeginClassRegister(type, L, __CreateInstance, 23, 30, 3);
 			Utils.RegisterFunc(L, Utils.CLS_IDX, "Quit", _m_Quit_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "Unload", _m_Unload_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "CanStreamedLevelBeLoaded", _m_CanStreamedLevelBeLoaded_xlua_st_);
@@ -51,16 +51,15 @@ namespace XLua.CSObjectWrap
 			Utils.RegisterFunc(L, Utils.CLS_IDX, "logMessageReceivedThreaded", _e_logMessageReceivedThreaded);
 			Utils.RegisterFunc(L, Utils.CLS_IDX, "onBeforeRender", _e_onBeforeRender);
 			Utils.RegisterFunc(L, Utils.CLS_IDX, "focusChanged", _e_focusChanged);
+			Utils.RegisterFunc(L, Utils.CLS_IDX, "deepLinkActivated", _e_deepLinkActivated);
 			Utils.RegisterFunc(L, Utils.CLS_IDX, "wantsToQuit", _e_wantsToQuit);
 			Utils.RegisterFunc(L, Utils.CLS_IDX, "quitting", _e_quitting);
+			Utils.RegisterFunc(L, Utils.CLS_IDX, "unloading", _e_unloading);
 			
             
 			Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "isPlaying", _g_get_isPlaying);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "isFocused", _g_get_isFocused);
-            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "platform", _g_get_platform);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "buildGUID", _g_get_buildGUID);
-            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "isMobilePlatform", _g_get_isMobilePlatform);
-            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "isConsolePlatform", _g_get_isConsolePlatform);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "runInBackground", _g_get_runInBackground);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "isBatchMode", _g_get_isBatchMode);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "dataPath", _g_get_dataPath);
@@ -78,12 +77,15 @@ namespace XLua.CSObjectWrap
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "companyName", _g_get_companyName);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "cloudProjectId", _g_get_cloudProjectId);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "targetFrameRate", _g_get_targetFrameRate);
-            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "systemLanguage", _g_get_systemLanguage);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "consoleLogPath", _g_get_consoleLogPath);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "backgroundLoadingPriority", _g_get_backgroundLoadingPriority);
-            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "internetReachability", _g_get_internetReachability);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "genuine", _g_get_genuine);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "genuineCheckAvailable", _g_get_genuineCheckAvailable);
+            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "platform", _g_get_platform);
+            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "isMobilePlatform", _g_get_isMobilePlatform);
+            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "isConsolePlatform", _g_get_isConsolePlatform);
+            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "systemLanguage", _g_get_systemLanguage);
+            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "internetReachability", _g_get_internetReachability);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "isEditor", _g_get_isEditor);
             
 			Utils.RegisterFunc(L, Utils.CLS_SETTER_IDX, "runInBackground", _s_set_runInBackground);
@@ -514,47 +516,11 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _g_get_platform(RealStatePtr L)
-        {
-		    try {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
-			    translator.Push(L, UnityEngine.Application.platform);
-            } catch(System.Exception gen_e) {
-                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
-            }
-            return 1;
-        }
-        
-        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _g_get_buildGUID(RealStatePtr L)
         {
 		    try {
             
 			    LuaAPI.lua_pushstring(L, UnityEngine.Application.buildGUID);
-            } catch(System.Exception gen_e) {
-                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
-            }
-            return 1;
-        }
-        
-        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _g_get_isMobilePlatform(RealStatePtr L)
-        {
-		    try {
-            
-			    LuaAPI.lua_pushboolean(L, UnityEngine.Application.isMobilePlatform);
-            } catch(System.Exception gen_e) {
-                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
-            }
-            return 1;
-        }
-        
-        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _g_get_isConsolePlatform(RealStatePtr L)
-        {
-		    try {
-            
-			    LuaAPI.lua_pushboolean(L, UnityEngine.Application.isConsolePlatform);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
             }
@@ -766,18 +732,6 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _g_get_systemLanguage(RealStatePtr L)
-        {
-		    try {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
-			    translator.Push(L, UnityEngine.Application.systemLanguage);
-            } catch(System.Exception gen_e) {
-                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
-            }
-            return 1;
-        }
-        
-        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _g_get_consoleLogPath(RealStatePtr L)
         {
 		    try {
@@ -802,18 +756,6 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _g_get_internetReachability(RealStatePtr L)
-        {
-		    try {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
-			    translator.Push(L, UnityEngine.Application.internetReachability);
-            } catch(System.Exception gen_e) {
-                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
-            }
-            return 1;
-        }
-        
-        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _g_get_genuine(RealStatePtr L)
         {
 		    try {
@@ -831,6 +773,66 @@ namespace XLua.CSObjectWrap
 		    try {
             
 			    LuaAPI.lua_pushboolean(L, UnityEngine.Application.genuineCheckAvailable);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_platform(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			    translator.Push(L, UnityEngine.Application.platform);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_isMobilePlatform(RealStatePtr L)
+        {
+		    try {
+            
+			    LuaAPI.lua_pushboolean(L, UnityEngine.Application.isMobilePlatform);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_isConsolePlatform(RealStatePtr L)
+        {
+		    try {
+            
+			    LuaAPI.lua_pushboolean(L, UnityEngine.Application.isConsolePlatform);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_systemLanguage(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			    translator.Push(L, UnityEngine.Application.systemLanguage);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_internetReachability(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			    translator.Push(L, UnityEngine.Application.internetReachability);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
             }
@@ -1041,6 +1043,35 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _e_deepLinkActivated(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			    int gen_param_count = LuaAPI.lua_gettop(L);
+                System.Action<string> gen_delegate = translator.GetDelegate<System.Action<string>>(L, 2);
+                if (gen_delegate == null) {
+                    return LuaAPI.luaL_error(L, "#2 need System.Action<string>!");
+                }
+                
+				
+				if (gen_param_count == 2 && LuaAPI.xlua_is_eq_str(L, 1, "+")) {
+					UnityEngine.Application.deepLinkActivated += gen_delegate;
+					return 0;
+				} 
+				
+				
+				if (gen_param_count == 2 && LuaAPI.xlua_is_eq_str(L, 1, "-")) {
+					UnityEngine.Application.deepLinkActivated -= gen_delegate;
+					return 0;
+				} 
+				
+			} catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+			return LuaAPI.luaL_error(L, "invalid arguments to UnityEngine.Application.deepLinkActivated!");
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _e_wantsToQuit(RealStatePtr L)
         {
 		    try {
@@ -1096,6 +1127,35 @@ namespace XLua.CSObjectWrap
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
             }
 			return LuaAPI.luaL_error(L, "invalid arguments to UnityEngine.Application.quitting!");
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _e_unloading(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			    int gen_param_count = LuaAPI.lua_gettop(L);
+                System.Action gen_delegate = translator.GetDelegate<System.Action>(L, 2);
+                if (gen_delegate == null) {
+                    return LuaAPI.luaL_error(L, "#2 need System.Action!");
+                }
+                
+				
+				if (gen_param_count == 2 && LuaAPI.xlua_is_eq_str(L, 1, "+")) {
+					UnityEngine.Application.unloading += gen_delegate;
+					return 0;
+				} 
+				
+				
+				if (gen_param_count == 2 && LuaAPI.xlua_is_eq_str(L, 1, "-")) {
+					UnityEngine.Application.unloading -= gen_delegate;
+					return 0;
+				} 
+				
+			} catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+			return LuaAPI.luaL_error(L, "invalid arguments to UnityEngine.Application.unloading!");
         }
         
     }

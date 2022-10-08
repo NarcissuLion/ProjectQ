@@ -53,6 +53,7 @@ end
 function RoundState:DoOwn(charData)
     --显示信息
     self.battle.ownTurn = true
+    self.battle.ownUuid = charData.uuid
     self.battle.view:SetOwnInfo(charData.uuid)
     self.battle.view:SetCharSelect(true , charData.pos , "Select")
     print("自己" .. charData.pos)
@@ -73,10 +74,15 @@ function RoundState:DoEnemy(charData)
             -- 等1s
             AsyncCall(function ()
                 -- 显示伤害
-                self.battle.view:ShowDamage(isOwn , pos , dmg)
+                if dmg > 0 then
+                    self.battle.view:ShowCure(isOwn , pos , dmg)
+                else
+                    self.battle.view:ShowDamage(isOwn , pos , dmg)
+                end
                 -- 扣血，刷新界面ui
                 self.battle:AddCharHp(isOwn ,pos , dmg)
                 self.battle.view:RefreshChar(self.battle:GetCharByPos(isOwn , pos))
+                self.battle.view:SetOwnInfo(self.battle.ownUuid)
                 AsyncCall(function ()
                     self:Pass()
                 end , 1)
@@ -93,10 +99,15 @@ function RoundState:DoEnemy(charData)
                 for index, p in ipairs(pos) do
                     local dmg = self:GetDmg(charData , skillId)                
                     -- 显示伤害
-                    self.battle.view:ShowDamage(isOwn , p , dmg)
+                    if dmg > 0 then
+                        self.battle.view:ShowCure(isOwn , p , dmg)
+                    else
+                        self.battle.view:ShowDamage(isOwn , p , dmg)
+                    end
                     -- 扣血，刷新界面ui
                     self.battle:AddCharHp(isOwn ,p , dmg)
                     self.battle.view:RefreshChar(self.battle:GetCharByPos(isOwn , p))
+                    self.battle.view:SetOwnInfo(self.battle.ownUuid)
                 end
                 AsyncCall(function ()
                     self:Pass()
@@ -261,6 +272,7 @@ function RoundState:GetDmg(charData , skillId)
 end
 
 function RoundState:OwnUseSkill(skillIndex,targetUuid)
+    self.battle.ownTurn = false
     local id = self.battle.sortBattleList[1]
     local charData = self.battle:GetCharData(id) 
     local skillId = charData.skill[skillIndex]
@@ -287,26 +299,25 @@ function RoundState:OwnUseSkill(skillIndex,targetUuid)
         if skillConfig.range == "aoe" then
             for index, p in ipairs(skillConfig.atkPos) do
                 local dmg = self:GetDmg(charData , skillId)                
-                self.battle.view:ShowDamage(true , p , dmg)
+                self.battle.view:ShowCure(true , p , dmg)
                 self.battle:AddCharHp(true ,p , dmg)
                 self.battle.view:RefreshChar(self.battle:GetCharByPos(true , p))
             end
         elseif skillConfig.range == "one" then
             local targetCharData = self.battle:GetCharData(targetUuid)            
             local dmg = self:GetDmg(charData , skillId)
-            self.battle.view:ShowDamage(true , targetCharData.pos , dmg)
+            self.battle.view:ShowCure(true , targetCharData.pos , dmg)
             self.battle:AddCharHp(true ,targetCharData.pos , dmg)
             self.battle.view:RefreshChar(self.battle:GetCharByPos(true , targetCharData.pos))
         elseif skillConfig.range == "own" then
             local dmg = self:GetDmg(charData , skillId)
-            self.battle.view:ShowDamage(true , charData.pos , dmg)
+            self.battle.view:ShowCure(true , charData.pos , dmg)
             self.battle:AddCharHp(true ,charData.pos , dmg)
             self.battle.view:RefreshChar(self.battle:GetCharByPos(true , charData.pos))
         end
     end
 
     AsyncCall(function ()
-        self.battle.ownTurn = false
         self.battle.view:SetOwnInfo(charData.uuid)
         self:Pass()
     end , 1)
@@ -341,8 +352,8 @@ function RoundState:IsGameOver()
 end
 
 --待完成项：
--- 我方角色的面板刷新
+-- 我方角色的面板刷新x
 -- 角色攻击时的移动判断
 -- 角色移动
--- bug我方操作时可重复点击
+-- bug我方操作时可重复点击x
 -- 动画

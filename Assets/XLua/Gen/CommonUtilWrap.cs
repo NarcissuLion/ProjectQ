@@ -31,7 +31,7 @@ namespace XLua.CSObjectWrap
 			Utils.EndObjectRegister(type, L, translator, null, null,
 			    null, null, null);
 
-		    Utils.BeginClassRegister(type, L, __CreateInstance, 255, 0, 0);
+		    Utils.BeginClassRegister(type, L, __CreateInstance, 257, 0, 0);
 			Utils.RegisterFunc(L, Utils.CLS_IDX, "GetChild", _m_GetChild_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "HasChild", _m_HasChild_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "GetTransform", _m_GetTransform_xlua_st_);
@@ -168,6 +168,7 @@ namespace XLua.CSObjectWrap
             Utils.RegisterFunc(L, Utils.CLS_IDX, "DORotate", _m_DORotate_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "DOFillAmount", _m_DOFillAmount_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "DOFillAmountFromTo", _m_DOFillAmountFromTo_xlua_st_);
+            Utils.RegisterFunc(L, Utils.CLS_IDX, "DoImageColor", _m_DoImageColor_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "DoImageFade", _m_DoImageFade_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "DoImageFadeFromTo", _m_DoImageFadeFromTo_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "DOImageFillAmount", _m_DOImageFillAmount_xlua_st_);
@@ -214,6 +215,7 @@ namespace XLua.CSObjectWrap
             Utils.RegisterFunc(L, Utils.CLS_IDX, "SubStringFromLastTo", _m_SubStringFromLastTo_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "Contains", _m_Contains_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "FormatText", _m_FormatText_xlua_st_);
+            Utils.RegisterFunc(L, Utils.CLS_IDX, "WriteToUTF8", _m_WriteToUTF8_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "Trim", _m_Trim_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "ReplaceStr", _m_ReplaceStr_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "ReplaceNonBreakingSpaces", _m_ReplaceNonBreakingSpaces_xlua_st_);
@@ -4223,6 +4225,36 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_DoImageColor_xlua_st_(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+            
+                
+                {
+                    UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
+                    string _path = LuaAPI.lua_tostring(L, 2);
+                    UnityEngine.Color _endColor;translator.Get(L, 3, out _endColor);
+                    float _duration = (float)LuaAPI.lua_tonumber(L, 4);
+                    string _ease = LuaAPI.lua_tostring(L, 5);
+                    
+                    CommonUtil.DoImageColor( _parent, _path, _endColor, _duration, _ease );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _m_DoImageFade_xlua_st_(RealStatePtr L)
         {
 		    try {
@@ -5460,6 +5492,31 @@ namespace XLua.CSObjectWrap
                     
                     
                     return 1;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_WriteToUTF8_xlua_st_(RealStatePtr L)
+        {
+		    try {
+            
+            
+            
+                
+                {
+                    string _path = LuaAPI.lua_tostring(L, 1);
+                    string _target = LuaAPI.lua_tostring(L, 2);
+                    
+                    CommonUtil.WriteToUTF8( _path, _target );
+                    
+                    
+                    
+                    return 0;
                 }
                 
             } catch(System.Exception gen_e) {

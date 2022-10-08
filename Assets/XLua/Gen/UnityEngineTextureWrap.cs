@@ -21,13 +21,15 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(UnityEngine.Texture);
-			Utils.BeginObjectRegister(type, L, translator, 0, 2, 13, 10);
+			Utils.BeginObjectRegister(type, L, translator, 0, 2, 15, 10);
 			
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetNativeTexturePtr", _m_GetNativeTexturePtr);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "IncrementUpdateCount", _m_IncrementUpdateCount);
 			
 			
-			Utils.RegisterFunc(L, Utils.GETTER_IDX, "width", _g_get_width);
+			Utils.RegisterFunc(L, Utils.GETTER_IDX, "mipmapCount", _g_get_mipmapCount);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "graphicsFormat", _g_get_graphicsFormat);
+            Utils.RegisterFunc(L, Utils.GETTER_IDX, "width", _g_get_width);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "height", _g_get_height);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "dimension", _g_get_dimension);
             Utils.RegisterFunc(L, Utils.GETTER_IDX, "isReadable", _g_get_isReadable);
@@ -56,11 +58,12 @@ namespace XLua.CSObjectWrap
 			Utils.EndObjectRegister(type, L, translator, null, null,
 			    null, null, null);
 
-		    Utils.BeginClassRegister(type, L, __CreateInstance, 3, 15, 4);
+		    Utils.BeginClassRegister(type, L, __CreateInstance, 4, 16, 5);
 			Utils.RegisterFunc(L, Utils.CLS_IDX, "SetGlobalAnisotropicFilteringLimits", _m_SetGlobalAnisotropicFilteringLimits_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "SetStreamingTextureMaterialDebugProperties", _m_SetStreamingTextureMaterialDebugProperties_xlua_st_);
             
 			
+            Utils.RegisterObject(L, translator, Utils.CLS_IDX, "GenerateAllMips", UnityEngine.Texture.GenerateAllMips);
             
 			Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "masterTextureLimit", _g_get_masterTextureLimit);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "anisotropicFiltering", _g_get_anisotropicFiltering);
@@ -77,11 +80,13 @@ namespace XLua.CSObjectWrap
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "streamingTextureLoadingCount", _g_get_streamingTextureLoadingCount);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "streamingTextureForceLoadAll", _g_get_streamingTextureForceLoadAll);
             Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "streamingTextureDiscardUnusedMips", _g_get_streamingTextureDiscardUnusedMips);
+            Utils.RegisterFunc(L, Utils.CLS_GETTER_IDX, "allowThreadedTextureCreation", _g_get_allowThreadedTextureCreation);
             
 			Utils.RegisterFunc(L, Utils.CLS_SETTER_IDX, "masterTextureLimit", _s_set_masterTextureLimit);
             Utils.RegisterFunc(L, Utils.CLS_SETTER_IDX, "anisotropicFiltering", _s_set_anisotropicFiltering);
             Utils.RegisterFunc(L, Utils.CLS_SETTER_IDX, "streamingTextureForceLoadAll", _s_set_streamingTextureForceLoadAll);
             Utils.RegisterFunc(L, Utils.CLS_SETTER_IDX, "streamingTextureDiscardUnusedMips", _s_set_streamingTextureDiscardUnusedMips);
+            Utils.RegisterFunc(L, Utils.CLS_SETTER_IDX, "allowThreadedTextureCreation", _s_set_allowThreadedTextureCreation);
             
 			
 			Utils.EndClassRegister(type, L, translator);
@@ -219,11 +224,39 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_mipmapCount(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                UnityEngine.Texture gen_to_be_invoked = (UnityEngine.Texture)translator.FastGetCSObj(L, 1);
+                LuaAPI.xlua_pushinteger(L, gen_to_be_invoked.mipmapCount);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _g_get_anisotropicFiltering(RealStatePtr L)
         {
 		    try {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			    translator.Push(L, UnityEngine.Texture.anisotropicFiltering);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_graphicsFormat(RealStatePtr L)
+        {
+		    try {
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			
+                UnityEngine.Texture gen_to_be_invoked = (UnityEngine.Texture)translator.FastGetCSObj(L, 1);
+                translator.Push(L, gen_to_be_invoked.graphicsFormat);
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
             }
@@ -568,6 +601,18 @@ namespace XLua.CSObjectWrap
             return 1;
         }
         
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _g_get_allowThreadedTextureCreation(RealStatePtr L)
+        {
+		    try {
+            
+			    LuaAPI.lua_pushboolean(L, UnityEngine.Texture.allowThreadedTextureCreation);
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 1;
+        }
+        
         
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
@@ -772,6 +817,19 @@ namespace XLua.CSObjectWrap
 		    try {
                 
 			    UnityEngine.Texture.streamingTextureDiscardUnusedMips = LuaAPI.lua_toboolean(L, 1);
+            
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            return 0;
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _s_set_allowThreadedTextureCreation(RealStatePtr L)
+        {
+		    try {
+                
+			    UnityEngine.Texture.allowThreadedTextureCreation = LuaAPI.lua_toboolean(L, 1);
             
             } catch(System.Exception gen_e) {
                 return LuaAPI.luaL_error(L, "c# exception:" + gen_e);

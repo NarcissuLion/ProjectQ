@@ -31,7 +31,7 @@ namespace XLua.CSObjectWrap
 			Utils.EndObjectRegister(type, L, translator, null, null,
 			    null, null, null);
 
-		    Utils.BeginClassRegister(type, L, __CreateInstance, 10, 1, 0);
+		    Utils.BeginClassRegister(type, L, __CreateInstance, 13, 1, 0);
 			Utils.RegisterFunc(L, Utils.CLS_IDX, "ExistsFromStreamingAssets", _m_ExistsFromStreamingAssets_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "ExistsFromPersistentData", _m_ExistsFromPersistentData_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "LoadBytesFromStreamingAssets", _m_LoadBytesFromStreamingAssets_xlua_st_);
@@ -40,6 +40,9 @@ namespace XLua.CSObjectWrap
             Utils.RegisterFunc(L, Utils.CLS_IDX, "LoadTextFromStreamingAssets", _m_LoadTextFromStreamingAssets_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "LoadTextFromPersistentData", _m_LoadTextFromPersistentData_xlua_st_);
             Utils.RegisterFunc(L, Utils.CLS_IDX, "LoadTextFromResource", _m_LoadTextFromResource_xlua_st_);
+            Utils.RegisterFunc(L, Utils.CLS_IDX, "Load", _m_Load_xlua_st_);
+            Utils.RegisterFunc(L, Utils.CLS_IDX, "GetAssemblyType", _m_GetAssemblyType_xlua_st_);
+            Utils.RegisterFunc(L, Utils.CLS_IDX, "LoadFromResource", _m_LoadFromResource_xlua_st_);
             
 			
             Utils.RegisterObject(L, translator, Utils.CLS_IDX, "ANDROID_STREAMIMG_PROTOCAL", ResourcesLoader.ANDROID_STREAMIMG_PROTOCAL);
@@ -252,6 +255,89 @@ namespace XLua.CSObjectWrap
                     
                         string gen_ret = ResourcesLoader.LoadTextFromResource( _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
+                    
+                    
+                    
+                    return 1;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_Load_xlua_st_(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+            
+                
+                {
+                    string _path = LuaAPI.lua_tostring(L, 1);
+                    System.Type _type = (System.Type)translator.GetObject(L, 2, typeof(System.Type));
+                    
+                        UnityEngine.Object gen_ret = ResourcesLoader.Load( _path, _type );
+                        translator.Push(L, gen_ret);
+                    
+                    
+                    
+                    return 1;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_GetAssemblyType_xlua_st_(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+            
+                
+                {
+                    string _resType = LuaAPI.lua_tostring(L, 1);
+                    
+                        System.Type gen_ret = ResourcesLoader.GetAssemblyType( _resType );
+                        translator.Push(L, gen_ret);
+                    
+                    
+                    
+                    return 1;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_LoadFromResource_xlua_st_(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+            
+                
+                {
+                    string _path = LuaAPI.lua_tostring(L, 1);
+                    string _resType = LuaAPI.lua_tostring(L, 2);
+                    
+                        object gen_ret = ResourcesLoader.LoadFromResource( _path, _resType );
+                        translator.PushAny(L, gen_ret);
                     
                     
                     

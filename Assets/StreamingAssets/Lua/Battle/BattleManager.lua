@@ -115,7 +115,7 @@ function BattleManager:AddCharHp(isOwn ,pos , hp)
 end
 
 function BattleManager:UseSkillToChar(skillIndex,uuid)
-    if self.state == BattleState.Round then
+    if self.state == BattleState.Round and self.ownTurn then
         self.fsmManager:OwnUseSkill(skillIndex,uuid)
         self.view:SetSkillSelect()
     end

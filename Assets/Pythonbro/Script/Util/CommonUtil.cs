@@ -1665,6 +1665,22 @@ public static class CommonUtil {
         }
     }
 
+    public static void DoImageColor(Object parent, string path, Color endColor, float duration, string ease)
+    {
+        Image image = GetComponent<Image>(parent, path);
+        if (image != null)
+        {
+            if (duration == 0)
+            {
+                image.color = endColor;
+            }
+            else
+            {
+                image.DOColor(endColor, duration).SetEase(GetDOEase(ease));
+            }
+        }
+    }
+
     public static void DoImageFade(Object parent, string path, float alpha, float duration, string ease) {
         Image image = GetComponent<Image>(parent, path);
         if (image != null) {
