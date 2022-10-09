@@ -54,9 +54,9 @@ function RoundState:DoOwn(charData)
     --显示信息
     self.battle.ownTurn = true
     self.battle.ownUuid = charData.uuid
-    self.battle.view:SetOwnInfo(charData.uuid)
+    self.battle.view:SetOwnInfo(charData)
     self.battle.view:SetCharSelect(true , charData.pos , "Select")
-    print("自己" .. charData.pos)
+    self.battle.view:SetCharTempMove(true , charData.pos)
 end
 
 function RoundState:DoEnemy(charData)
@@ -82,7 +82,7 @@ function RoundState:DoEnemy(charData)
                 -- 扣血，刷新界面ui
                 self.battle:AddCharHp(isOwn ,pos , dmg)
                 self.battle.view:RefreshChar(self.battle:GetCharByPos(isOwn , pos))
-                self.battle.view:SetOwnInfo(self.battle.ownUuid)
+                self.battle.view:SetOwnInfo(self.battle:GetCharData(self.battle.ownUuid))
                 AsyncCall(function ()
                     self:Pass()
                 end , 1)
@@ -107,7 +107,7 @@ function RoundState:DoEnemy(charData)
                     -- 扣血，刷新界面ui
                     self.battle:AddCharHp(isOwn ,p , dmg)
                     self.battle.view:RefreshChar(self.battle:GetCharByPos(isOwn , p))
-                    self.battle.view:SetOwnInfo(self.battle.ownUuid)
+                    self.battle.view:SetOwnInfo(self.battle:GetCharData(self.battle.ownUuid))
                 end
                 AsyncCall(function ()
                     self:Pass()
@@ -138,7 +138,7 @@ function RoundState:RandomEnemyAction(charData)
         local index = math.random(1 , #skills)
         local skillId = skills[index]
         local skillConfig = ConfigManager:GetConfig("Skill")        
-        local skillConfig = skillConfig[skillId]
+        skillConfig = skillConfig[skillId]
         if skillConfig == nil then
             printError("技能" .. skillId .. "表中缺失")
             return
@@ -318,9 +318,27 @@ function RoundState:OwnUseSkill(skillIndex,targetUuid)
     end
 
     AsyncCall(function ()
-        self.battle.view:SetOwnInfo(charData.uuid)
+        self.battle.view:SetOwnInfo(charData)
         self:Pass()
     end , 1)
+end
+
+function RoundState:OwnMove(moveTo)
+    self.battle.ownTurn = false
+    local id = self.battle.sortBattleList[1]
+    local charData = self.battle:GetCharData(id)
+    local orgPos = charData.pos
+    self.battle.view:ExchangeChar(true , charData.pos , moveTo)
+    printJson(self.battle:GetCharData(id))
+    self.battle:ExchangeChar(true , charData.pos , moveTo)
+    printJson(self.battle:GetCharData(id))
+
+    AsyncCall(function ()
+        self.battle.view:RefreshChar(self.battle:GetCharByPos(true , orgPos))
+        self.battle.view:RefreshChar(self.battle:GetCharByPos(true , moveTo))
+        self.battle.view:SetOwnInfo(charData)
+        self:Pass()
+    end , 0.8)
 end
 
 function RoundState:IsGameOver()

@@ -27,6 +27,7 @@ function BattleUI:CreatePlayer(isOwn , pos , charData)
         self.own[pos] = GameUtil.CreatePrefabToParent("Prefab/Character/Player",parent,pos)
         player = self.own[pos]
         CommonUtil.AddButtonClick(player, "SelectedCure", BindFunction(self, self.OnClickUseSkillToChar, charData.uuid))
+        CommonUtil.AddButtonClick(player, "SelectedMove", BindFunction(self, self.OnSelectMove, pos))
     else
         local parent = CommonUtil.GetChild(self.root,"Character/Enemy")
         self.enemy[pos] = GameUtil.CreatePrefabToParent("Prefab/Character/Player",parent,pos)
@@ -45,16 +46,21 @@ function BattleUI:SetRound(index)
     CommonUtil.SetText(self.root,"Top/RoundIndex","第"..index.."回合")
 end
 
-function BattleUI:SetOwnInfo(uuid)
+function BattleUI:SetOwnInfo(charData,newPos)
+    printJson(charData)
     local ownInfo = CommonUtil.GetChild(self.root,"UI/Own")
-    CommonUtil.SetActive(ownInfo ,nil, uuid ~= nil)
-    if uuid == nil then
+    CommonUtil.SetActive(ownInfo ,nil, charData ~= nil)
+    if charData == nil then
         return
     end
-    local charData = self.battleManager:GetCharData(uuid)
+    CommonUtil.SetActive(ownInfo ,nil, charData.isDead == nil)
     if charData.isDead ~= nil then
-        CommonUtil.SetActive(ownInfo ,nil, uuid ~= nil)
         return
+    end
+
+    local nowPos = charData.pos
+    if newPos ~= nil then
+        nowPos = newPos
     end
     local configData = ConfigManager:GetConfig("Character")
     local maxHp = configData[charData.uid].hp
@@ -64,14 +70,15 @@ function BattleUI:SetOwnInfo(uuid)
     CommonUtil.SetText(ownInfo,"Hp" ,"HP:" .. charData.hp .. "/" .. maxHp)
     CommonUtil.SetText(ownInfo,"Speed" ,"SPD:" .. charData.spd)
     CommonUtil.SetText(ownInfo,"Atk" ,"ATK:" .. charData.atk)
-
+    CommonUtil.SetActive(ownInfo, "Move",charData.move > 0)
+    CommonUtil.AddButtonClick(ownInfo, "Move", BindFunction(self, self.OnClickMove, charData))
     for i = 1, 4 do
         local skillId = charData.skill[i]
         CommonUtil.SetActive(ownInfo,"Skill/" .. i , skillId ~= nil)
         if skillId ~= nil then
             local skillConfig = ConfigManager:GetConfig("Skill")[skillId]
             CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/name", skillConfig.name)
-            CommonUtil.AddButtonClick(ownInfo,"Skill/"..i , BindFunction(self,self.SetSkillSelect,i,skillConfig,charData.pos))
+            CommonUtil.AddButtonClick(ownInfo,"Skill/"..i , BindFunction(self,self.SetSkillSelect,i,skillConfig,nowPos))
             --射程
             if skillConfig.range == "own" then
                 CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/atkPos","射程:自己")
@@ -121,7 +128,7 @@ function BattleUI:SetOwnInfo(uuid)
                 -- 检查站位
                 local posRight = false
                 for index, pos in ipairs(skillConfig.pos) do
-                    if charData.pos == pos then
+                    if nowPos == pos then
                         posRight = true
                         break
                     end
@@ -188,11 +195,13 @@ function BattleUI:SetCharSelectOff()
         CommonUtil.SetActive(player,"Select" , false)
         CommonUtil.SetActive(player,"Selected" , false)
         CommonUtil.SetActive(player,"SelectedCure" , false)
+        CommonUtil.SetActive(player,"SelectedMove" , false)
     end
     for key, player in pairs(self.enemy) do
         CommonUtil.SetActive(player,"Select" , false)
         CommonUtil.SetActive(player,"Selected" , false)
         CommonUtil.SetActive(player,"SelectedCure" , false)
+        CommonUtil.SetActive(player,"SelectedMove" , false)
     end
 end
 
@@ -215,14 +224,15 @@ function BattleUI:RefreshChar(charData)
             CommonUtil.SetActive(self.own[charData.pos] , nil , false)
             return
         end
+        ImageLoader.SetImage(self.own[charData.pos],"Img" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
         CommonUtil.SetText(self.own[charData.pos],"HpBar/Text" , charData.hp .. "/" .. maxHp)
         CommonUtil.SetImageFillAmount(self.own[charData.pos], "HpBar/Image" , charData.hp/maxHp)
     else
-        print(charData.isDead)
         if charData.isDead then
             CommonUtil.SetActive(self.enemy[charData.pos] , nil , false)
             return
         end
+        ImageLoader.SetImage(self.enemy[charData.pos],"Img" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
         CommonUtil.SetText(self.enemy[charData.pos],"HpBar/Text" , charData.hp .. "/" .. maxHp)
         CommonUtil.SetImageFillAmount(self.enemy[charData.pos] , "HpBar/Image" , charData.hp/maxHp)
     end
@@ -292,8 +302,7 @@ function BattleUI:SetOwnSkillAllDisenable()
     end
 end
 
-function BattleUI:SetSkillSelect(index , skillConfig , ownIndex)
-    
+function BattleUI:SetSkillSelect(index , skillConfig , ownPos)    
     for i = 1, 4 do
         CommonUtil.SetActive(self.root,"UI/Own/Skill/" .. i .. "/Select",false)
     end
@@ -308,18 +317,132 @@ function BattleUI:SetSkillSelect(index , skillConfig , ownIndex)
     if skillConfig.typ == "cure" then
         for key, pos in ipairs(skillConfig.atkPos) do
             if pos == 0 then
-                self:SetCharSelect(true , ownIndex , "SelectedCure")
+                self:SetCharSelect(true , ownPos , "SelectedCure")
             else
                 self:SetCharSelect(true , pos , "SelectedCure")
             end
         end
     elseif skillConfig.typ == "atk" then
+        -- -- 增加移动后的攻击距离
+        -- local atkPos = self.battleManager:GetMoveAtkPos(true , ownPos , skillConfig)
         for key, pos in ipairs(skillConfig.atkPos) do
-            self:SetCharSelect(false , pos , "Selected")
+            if not self.battleManager:GetCharByPos(false , pos).isDead then
+                self:SetCharSelect(false , pos , "Selected")
+            end
         end
     end
 end
 
+function BattleUI:SetCharTempMove(isOwn , nowPos , orderPos)
+    if orderPos == nil then
+        orderPos = self.battleManager:GetOrderPos(isOwn , nowPos)
+    end
+    local canMovePos = self.battleManager:GetCharTempMovePos(isOwn , nowPos)
+    if #canMovePos == 0 then
+        return
+    end
+    local charData = self.battleManager:GetCharByPos(isOwn , nowPos)
+    local configData = ConfigManager:GetConfig("Character")
+    local maxHp = configData[charData.uid].hp
+    local allPos = {self.own[4],self.own[3],self.own[2],self.own[1],
+                   self.enemy[1],self.enemy[2],self.enemy[3],self.enemy[4]}
+    for index, pos in ipairs(canMovePos) do
+        local player = allPos[pos]
+        CommonUtil.SetActive(player,nil,true)
+        if pos ~= orderPos then
+            CommonUtil.SetActive(player,"Img",false)
+            CommonUtil.SetActive(player,"Img2",true)
+            CommonUtil.SetActive(player,"HpBar",false)
+            CommonUtil.SetActive(player,"Select",false)
+            CommonUtil.SetActive(player,"Damage",false)
+            CommonUtil.SetActive(player,"Cure",false)
+            CommonUtil.SetActive(player,"Btn",false)
+            CommonUtil.SetActive(player,"Selected",false)
+            CommonUtil.SetActive(player,"SelectedCure",false)
+            CommonUtil.SetActive(player,"SelectedMove",true)
+            ImageLoader.SetImage(player,"Img2" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
+            CommonUtil.AddButtonClick(player, "SelectedMove", BindFunction(self, self.SetCharTempMove, isOwn , nowPos , pos))
+        else
+            CommonUtil.SetActive(player,"Img",true)
+            CommonUtil.SetActive(player,"Img2",false)
+            CommonUtil.SetActive(player,"HpBar",true)
+            CommonUtil.SetActive(player,"Select",true)
+            CommonUtil.SetActive(player,"Damage",false)
+            CommonUtil.SetActive(player,"Cure",false)
+            CommonUtil.SetActive(player,"Btn",false)
+            CommonUtil.SetActive(player,"Selected",false)
+            CommonUtil.SetActive(player,"SelectedCure",false)
+            CommonUtil.SetActive(player,"SelectedMove",false)
+            ImageLoader.SetImage(player,"Img" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
+            CommonUtil.SetText(player,"HpBar/Text" , charData.hp .. "/" .. maxHp)
+            CommonUtil.SetImageFillAmount(player, "HpBar/Image" , charData.hp/maxHp)
+        end        
+    end
+    local camp,newPos = self.battleManager:GetCampPos(orderPos)
+    self:SetOwnInfo(charData , newPos)
+end
+
 function BattleUI:OnClickUseSkillToChar(uuid)
     self.battleManager:UseSkillToChar(self.selectSkillIndex , uuid)
+end
+
+function BattleUI:OnClickMove(charData)
+    self:SetSkillSelect()
+    if charData.move == 0 then
+        ViewUtils.ShowHint("此角色不能移动",1)
+        return
+    end
+    self:ShowMoveSelect(charData)
+end
+
+function BattleUI:ShowMoveSelect(charData)
+    self:SetCharSelectedOff()
+    local pos = charData.pos 
+    local step = charData.move
+    if step == 1 then
+        for i = 1, 3 do
+            if i == pos - step or i == pos + step then
+                self:SetCharSelect(true , i , "SelectedMove")
+            end
+        end
+    end
+
+    if step == 2 then
+        for i = 1, 3 do
+            if i ~= pos then
+                self:SetCharSelect(true , i , "SelectedMove")
+            end
+        end
+    end
+end
+
+function BattleUI:OnSelectMove(moveTo)
+    self.battleManager:OwnMove(moveTo)
+end
+
+function BattleUI:ExchangeChar(isOwn ,pos1 , pos2)
+    if isOwn then
+        --播动画
+        local position1 = self.own[pos1].transform.position
+        local position2 = self.own[pos2].transform.position
+        CommonUtil.DOMove(self.own[pos1],nil , position2 , 0.8)
+        CommonUtil.DOMove(self.own[pos2],nil , position1 , 0.8)
+        --还原
+        AsyncCall(function ()
+            self.own[pos1].transform.position = position1
+            self.own[pos2].transform.position = position2
+        end,0.8)
+    else
+        --播动画
+        local localPos1 = self.enemy[pos1].transform.localPosition
+        local localPos2 = self.enemy[pos2].transform.localPosition
+        CommonUtil.DOLocalMove(self.enemy[pos1],nil , localPos2 , 0.8)
+        CommonUtil.DOLocalMove(self.enemy[pos2],nil , localPos1 , 0.8)
+        --还原
+        AsyncCall(function ()
+            self.enemy[pos1].transform.localPosition = localPos1
+            self.enemy[pos2].transform.localPosition = localPos2
+        end,0.8)
+    end
+    
 end
