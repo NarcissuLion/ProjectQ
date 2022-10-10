@@ -296,3 +296,25 @@ function BattleManager:GetOrderData()
     return allData
 end
 
+function BattleManager:GetNowAtkPos(nowOrderPos , newOrderPos , skillConfig)
+    local atkPos = {}
+
+    
+
+    if newOrderPos ~= nil and newOrderPos ~= nowOrderPos and #skillConfig.atkPos~=4 and skillConfig.range ~= "own" then
+        local step = newOrderPos - nowOrderPos
+        for index, pos in ipairs(skillConfig.atkPos) do                
+            if skillConfig.typ == "cure" then
+                pos = math.max(1 , math.min(4 ,pos - step))
+            else
+                pos = math.max(1 ,math.min(4 , pos + step))
+            end
+            table.insert(atkPos , pos)
+        end
+    else
+        atkPos = skillConfig.atkPos
+    end
+
+    return atkPos
+end
+

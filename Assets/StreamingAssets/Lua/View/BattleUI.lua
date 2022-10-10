@@ -47,7 +47,6 @@ function BattleUI:SetRound(index)
 end
 
 function BattleUI:SetOwnInfo(charData,newOrderPos)
-    printJson(charData)
     local ownInfo = CommonUtil.GetChild(self.root,"UI/Own")
     CommonUtil.SetActive(ownInfo ,nil, charData ~= nil)
     if charData == nil then
@@ -126,7 +125,7 @@ function BattleUI:SetOwnInfo(charData,newOrderPos)
             end
 
             --判断技能哪些可以用
-            local canUse = true
+            local canUse = self.battleManager.ownTurn
             if self.battleManager.ownTurn then
                 -- 检查站位
                 -- local posRight = false
@@ -233,7 +232,9 @@ function BattleUI:RefreshChar(charData)
     CommonUtil.SetActive(player,"Img",true)
     CommonUtil.SetActive(player,"Img2",false)
     CommonUtil.SetActive(player,"HpBar",true)
-    CommonUtil.SetActive(player,"Select",true)
+    CommonUtil.SetActive(player,"Damage",true)
+    CommonUtil.SetActive(player,"Cure",true)
+    CommonUtil.SetActive(player,"Select",false)
     CommonUtil.SetActive(player,"Selected",false)
     CommonUtil.SetActive(player,"SelectedCure",false)
     CommonUtil.SetActive(player,"SelectedMove",false)
@@ -243,10 +244,10 @@ function BattleUI:RefreshChar(charData)
 end
 
 function BattleUI:RefreshAllChar()
-    for uuid, data in ipairs(self.battleManager.own) do
+    for uuid, data in pairs(self.battleManager.own) do
         self:RefreshChar(data)
     end
-    for uuid, data in ipairs(self.battleManager.enemy) do
+    for uuid, data in pairs(self.battleManager.enemy) do
         self:RefreshChar(data)
     end
 end
@@ -327,28 +328,10 @@ function BattleUI:SetSkillSelect(index , skillConfig , nowOrderPos , newOrderPos
     CommonUtil.SetActive(self.root,"UI/Own/Skill/" .. index .. "/Select",true)
 
     self:SetCharSelectedOff()
-
-    local isOwn , nowPos = self.battleManager:GetCampPos(newOrderPos)
-    local atkPos = {}
-
     self.newOrderPos = newOrderPos
 
-    if newOrderPos ~= nil and newOrderPos ~= nowOrderPos and #skillConfig.atkPos~=4 then
-        local step = newOrderPos - nowOrderPos
-        for index, pos in ipairs(skillConfig.atkPos) do                
-            if skillConfig.typ == "cure" then
-                if skillConfig.range ~= "own" then
-                    pos = math.max(1 , math.min(4 ,pos - step))
-                end
-            else
-                pos = math.max(1 ,math.min(4 , pos + step))
-            end
-            table.insert(atkPos , pos)
-        end
-    else
-        atkPos = skillConfig.atkPos
-    end
-
+    local isOwn , nowPos = self.battleManager:GetCampPos(nowOrderPos)
+    local atkPos = self.battleManager:GetNowAtkPos(nowOrderPos , newOrderPos , skillConfig)
     if skillConfig.typ == "cure" then
         for key, pos in ipairs(atkPos) do
             if pos == 0 then

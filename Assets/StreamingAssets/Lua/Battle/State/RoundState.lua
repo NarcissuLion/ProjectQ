@@ -60,17 +60,14 @@ function RoundState:DoOwn(charData)
 end
 
 function RoundState:DoEnemy(charData)
-    print("敌人" .. charData.pos)
     self.battle.view:SetCharSelect(false , charData.pos , "Select")
     local skillId = self:RandomEnemyAction(charData)
     if skillId ~= nil then
-        print("使用技能id:" .. skillId)
         local isOwn ,pos = self:RandomAtkPos(skillId , charData.pos)
         if type(pos) == "number" then
             -- 选中对象
             self.battle.view:SetCharSelect(isOwn , pos ,"Selected" )
             local dmg = self:GetDmg(charData , skillId)
-            print("选中对象".. pos)
             -- 等1s
             AsyncCall(function ()
                 -- 显示伤害
@@ -91,7 +88,6 @@ function RoundState:DoEnemy(charData)
             for index, p in ipairs(pos) do
                 -- 选中对象
                 self.battle.view:SetCharSelect(isOwn , p ,"Selected" )
-                print("选中对象"..  p)
             end
             
             -- 等1s
@@ -272,14 +268,15 @@ function RoundState:GetDmg(charData , skillId)
 end
 
 function RoundState:OwnUseSkill(skillIndex,targetUuid)
-    local function Atk(charData)
+    local function Atk(charData , nowOrderPos , newOrderPos)
         local skillId = charData.skill[skillIndex]
         local skillConfig = ConfigManager:GetConfig("Skill")
-        local skillConfig = skillConfig[skillId]
+        skillConfig = skillConfig[skillId]
 
         if skillConfig.typ == "atk" then
             if skillConfig.range == "aoe" then
-                for index, p in ipairs(skillConfig.atkPos) do
+                local atkPos = self.battle:GetNowAtkPos(nowOrderPos , newOrderPos , skillConfig)
+                for index, p in ipairs(atkPos) do
                     local dmg = self:GetDmg(charData , skillId)                
                     self.battle.view:ShowDamage(false , p , dmg)
                     self.battle:AddCharHp(false ,p , dmg)
@@ -295,7 +292,8 @@ function RoundState:OwnUseSkill(skillIndex,targetUuid)
 
         elseif skillConfig.typ == "cure" then
             if skillConfig.range == "aoe" then
-                for index, p in ipairs(skillConfig.atkPos) do
+                local atkPos = self.battle:GetNowAtkPos(nowOrderPos , newOrderPos , skillConfig)
+                for index, p in ipairs(atkPos) do
                     local dmg = self:GetDmg(charData , skillId)                
                     self.battle.view:ShowCure(true , p , dmg)
                     self.battle:AddCharHp(true ,p , dmg)
@@ -313,18 +311,23 @@ function RoundState:OwnUseSkill(skillIndex,targetUuid)
                 self.battle:AddCharHp(true ,charData.pos , dmg)
                 self.battle.view:RefreshChar(self.battle:GetCharByPos(true , charData.pos))
             end
-        end
-
-        
+        end       
     end
 
+
+    
+    
     self.battle.ownTurn = false
     local id = self.battle.sortBattleList[1]
     local charData = self.battle:GetCharData(id) 
     local nowOrderPos = self.battle:GetOrderPos(charData.isOwn , charData.pos)
     local newOrderPos = self.battle.view.newOrderPos
-    if newOrderPos == nil or nowOrderPos == newOrderPos then
-        Atk(charData)
+    local skillId = charData.skill[skillIndex]
+    local skillConfig = ConfigManager:GetConfig("Skill")
+    skillConfig = skillConfig[skillId]
+    if newOrderPos == nil or nowOrderPos == newOrderPos or skillConfig.range == "own" or #skillConfig.atkPos == 4 then
+        Atk(charData , nowOrderPos , newOrderPos)
+        self.battle.view:RefreshAllChar()
         AsyncCall(function ()
             self.battle.view:SetOwnInfo(charData)
             self:Pass()
@@ -337,9 +340,9 @@ function RoundState:OwnUseSkill(skillIndex,targetUuid)
             targetPos = self.battle.view.enemy[newPos].transform.position
         end
         CommonUtil.DOMove(self.battle.view.own[charData.pos],nil , targetPos , 0.8)
+        self.battle.view:RefreshAllChar()
         AsyncCall(function ()
-            Atk(charData)
-            self.battle.view:RefreshAllChar()
+            Atk(charData, nowOrderPos , newOrderPos)
             AsyncCall(function ()
                 CommonUtil.DOMove(self.battle.view.own[charData.pos],nil , nowPositon , 0.8)
                 AsyncCall(function ()
@@ -357,9 +360,7 @@ function RoundState:OwnMove(moveTo)
     local charData = self.battle:GetCharData(id)
     local orgPos = charData.pos
     self.battle.view:ExchangeChar(true , charData.pos , moveTo)
-    printJson(self.battle:GetCharData(id))
     self.battle:ExchangeChar(true , charData.pos , moveTo)
-    printJson(self.battle:GetCharData(id))
 
     AsyncCall(function ()
         self.battle.view:RefreshChar(self.battle:GetCharByPos(true , orgPos))
