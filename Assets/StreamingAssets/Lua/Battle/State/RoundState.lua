@@ -144,16 +144,16 @@ function RoundState:RandomEnemyAction(charData)
             return
         end
         -- 检查站位
-        local posRight = false
-        for index, pos in ipairs(skillConfig.pos) do
-            if charData.pos == pos then
-                posRight = true
-                break
-            end
-        end
-        if not posRight then
-            table.remove(skills,index)
-        else
+        -- local posRight = false
+        -- for index, pos in ipairs(skillConfig.pos) do
+        --     if charData.pos == pos then
+        --         posRight = true
+        --         break
+        --     end
+        -- end
+        -- if not posRight then
+        --     table.remove(skills,index)
+        -- else
             
             --检查治疗
             if skillConfig.typ == "cure" and skillConfig.range == "own" and hpIsFull then
@@ -178,7 +178,7 @@ function RoundState:RandomEnemyAction(charData)
 
                 table.remove(skills,index)
             end
-        end
+        -- end
     end 
     return nil
 end
@@ -272,55 +272,83 @@ function RoundState:GetDmg(charData , skillId)
 end
 
 function RoundState:OwnUseSkill(skillIndex,targetUuid)
+    local function Atk(charData)
+        local skillId = charData.skill[skillIndex]
+        local skillConfig = ConfigManager:GetConfig("Skill")
+        local skillConfig = skillConfig[skillId]
+
+        if skillConfig.typ == "atk" then
+            if skillConfig.range == "aoe" then
+                for index, p in ipairs(skillConfig.atkPos) do
+                    local dmg = self:GetDmg(charData , skillId)                
+                    self.battle.view:ShowDamage(false , p , dmg)
+                    self.battle:AddCharHp(false ,p , dmg)
+                    self.battle.view:RefreshChar(self.battle:GetCharByPos(false , p))
+                end
+            elseif skillConfig.range == "one" then
+                local targetCharData = self.battle:GetCharData(targetUuid)            
+                local dmg = self:GetDmg(charData , skillId)
+                self.battle.view:ShowDamage(false , targetCharData.pos , dmg)
+                self.battle:AddCharHp(false ,targetCharData.pos , dmg)
+                self.battle.view:RefreshChar(self.battle:GetCharByPos(false , targetCharData.pos))
+            end
+
+        elseif skillConfig.typ == "cure" then
+            if skillConfig.range == "aoe" then
+                for index, p in ipairs(skillConfig.atkPos) do
+                    local dmg = self:GetDmg(charData , skillId)                
+                    self.battle.view:ShowCure(true , p , dmg)
+                    self.battle:AddCharHp(true ,p , dmg)
+                    self.battle.view:RefreshChar(self.battle:GetCharByPos(true , p))
+                end
+            elseif skillConfig.range == "one" then
+                local targetCharData = self.battle:GetCharData(targetUuid)            
+                local dmg = self:GetDmg(charData , skillId)
+                self.battle.view:ShowCure(true , targetCharData.pos , dmg)
+                self.battle:AddCharHp(true ,targetCharData.pos , dmg)
+                self.battle.view:RefreshChar(self.battle:GetCharByPos(true , targetCharData.pos))
+            elseif skillConfig.range == "own" then
+                local dmg = self:GetDmg(charData , skillId)
+                self.battle.view:ShowCure(true , charData.pos , dmg)
+                self.battle:AddCharHp(true ,charData.pos , dmg)
+                self.battle.view:RefreshChar(self.battle:GetCharByPos(true , charData.pos))
+            end
+        end
+
+        
+    end
+
     self.battle.ownTurn = false
     local id = self.battle.sortBattleList[1]
     local charData = self.battle:GetCharData(id) 
-    local skillId = charData.skill[skillIndex]
-    local skillConfig = ConfigManager:GetConfig("Skill")
-    local skillConfig = skillConfig[skillId]
-
-    if skillConfig.typ == "atk" then
-        if skillConfig.range == "aoe" then
-            for index, p in ipairs(skillConfig.atkPos) do
-                local dmg = self:GetDmg(charData , skillId)                
-                self.battle.view:ShowDamage(false , p , dmg)
-                self.battle:AddCharHp(false ,p , dmg)
-                self.battle.view:RefreshChar(self.battle:GetCharByPos(false , p))
-            end
-        elseif skillConfig.range == "one" then
-            local targetCharData = self.battle:GetCharData(targetUuid)            
-            local dmg = self:GetDmg(charData , skillId)
-            self.battle.view:ShowDamage(false , targetCharData.pos , dmg)
-            self.battle:AddCharHp(false ,targetCharData.pos , dmg)
-            self.battle.view:RefreshChar(self.battle:GetCharByPos(false , targetCharData.pos))
+    local nowOrderPos = self.battle:GetOrderPos(charData.isOwn , charData.pos)
+    local newOrderPos = self.battle.view.newOrderPos
+    if newOrderPos == nil or nowOrderPos == newOrderPos then
+        Atk(charData)
+        AsyncCall(function ()
+            self.battle.view:SetOwnInfo(charData)
+            self:Pass()
+        end , 1)
+    else
+        local isOwn , newPos = self.battle:GetCampPos(newOrderPos)
+        local nowPositon = self.battle.view.own[charData.pos].transform.position
+        local targetPos= self.battle.view.own[newPos].transform.position
+        if not isOwn then
+            targetPos = self.battle.view.enemy[newPos].transform.position
         end
-        
-    elseif skillConfig.typ == "cure" then
-        if skillConfig.range == "aoe" then
-            for index, p in ipairs(skillConfig.atkPos) do
-                local dmg = self:GetDmg(charData , skillId)                
-                self.battle.view:ShowCure(true , p , dmg)
-                self.battle:AddCharHp(true ,p , dmg)
-                self.battle.view:RefreshChar(self.battle:GetCharByPos(true , p))
-            end
-        elseif skillConfig.range == "one" then
-            local targetCharData = self.battle:GetCharData(targetUuid)            
-            local dmg = self:GetDmg(charData , skillId)
-            self.battle.view:ShowCure(true , targetCharData.pos , dmg)
-            self.battle:AddCharHp(true ,targetCharData.pos , dmg)
-            self.battle.view:RefreshChar(self.battle:GetCharByPos(true , targetCharData.pos))
-        elseif skillConfig.range == "own" then
-            local dmg = self:GetDmg(charData , skillId)
-            self.battle.view:ShowCure(true , charData.pos , dmg)
-            self.battle:AddCharHp(true ,charData.pos , dmg)
-            self.battle.view:RefreshChar(self.battle:GetCharByPos(true , charData.pos))
-        end
+        CommonUtil.DOMove(self.battle.view.own[charData.pos],nil , targetPos , 0.8)
+        AsyncCall(function ()
+            Atk(charData)
+            self.battle.view:RefreshAllChar()
+            AsyncCall(function ()
+                CommonUtil.DOMove(self.battle.view.own[charData.pos],nil , nowPositon , 0.8)
+                AsyncCall(function ()
+                    self.battle.view:SetOwnInfo(charData)
+                    self:Pass()
+                end , 1)
+            end,0.5)
+        end , 0.8)
     end
-
-    AsyncCall(function ()
-        self.battle.view:SetOwnInfo(charData)
-        self:Pass()
-    end , 1)
 end
 
 function RoundState:OwnMove(moveTo)

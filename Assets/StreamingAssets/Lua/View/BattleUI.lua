@@ -46,7 +46,7 @@ function BattleUI:SetRound(index)
     CommonUtil.SetText(self.root,"Top/RoundIndex","第"..index.."回合")
 end
 
-function BattleUI:SetOwnInfo(charData,newPos)
+function BattleUI:SetOwnInfo(charData,newOrderPos)
     printJson(charData)
     local ownInfo = CommonUtil.GetChild(self.root,"UI/Own")
     CommonUtil.SetActive(ownInfo ,nil, charData ~= nil)
@@ -59,8 +59,11 @@ function BattleUI:SetOwnInfo(charData,newPos)
     end
 
     local nowPos = charData.pos
-    if newPos ~= nil then
-        nowPos = newPos
+    local nowOrderPos = self.battleManager:GetOrderPos(true , charData.pos)
+    local newPos
+    local newChamp
+    if newOrderPos ~= nil then
+        newChamp, newPos = self.battleManager:GetCampPos(newOrderPos)
     end
     local configData = ConfigManager:GetConfig("Character")
     local maxHp = configData[charData.uid].hp
@@ -70,15 +73,15 @@ function BattleUI:SetOwnInfo(charData,newPos)
     CommonUtil.SetText(ownInfo,"Hp" ,"HP:" .. charData.hp .. "/" .. maxHp)
     CommonUtil.SetText(ownInfo,"Speed" ,"SPD:" .. charData.spd)
     CommonUtil.SetText(ownInfo,"Atk" ,"ATK:" .. charData.atk)
-    CommonUtil.SetActive(ownInfo, "Move",charData.move > 0)
-    CommonUtil.AddButtonClick(ownInfo, "Move", BindFunction(self, self.OnClickMove, charData))
+    -- CommonUtil.SetActive(ownInfo, "Move",charData.move > 0)
+    -- CommonUtil.AddButtonClick(ownInfo, "Move", BindFunction(self, self.OnClickMove, charData))
     for i = 1, 4 do
         local skillId = charData.skill[i]
         CommonUtil.SetActive(ownInfo,"Skill/" .. i , skillId ~= nil)
         if skillId ~= nil then
             local skillConfig = ConfigManager:GetConfig("Skill")[skillId]
             CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/name", skillConfig.name)
-            CommonUtil.AddButtonClick(ownInfo,"Skill/"..i , BindFunction(self,self.SetSkillSelect,i,skillConfig,nowPos))
+            CommonUtil.AddButtonClick(ownInfo,"Skill/"..i , BindFunction(self,self.SetSkillSelect,i,skillConfig,nowOrderPos,newOrderPos))
             --射程
             if skillConfig.range == "own" then
                 CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/atkPos","射程:自己")
@@ -104,16 +107,16 @@ function BattleUI:SetOwnInfo(charData,newPos)
                 CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/atkPos","射程:[" .. text .. "]")
             end
 
-            --站位
-            local text = ""
-            for index, pos in ipairs(skillConfig.pos) do
-                if index == 1 then
-                    text = text .. pos
-                else
-                    text = text .. "," .. pos
-                end
-            end
-            CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/pos","站位:[" .. text .. "]")
+            -- --站位
+            -- local text = ""
+            -- for index, pos in ipairs(skillConfig.pos) do
+            --     if index == 1 then
+            --         text = text .. pos
+            --     else
+            --         text = text .. "," .. pos
+            --     end
+            -- end
+            -- CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/pos","站位:[" .. text .. "]")
 
             --伤害
             if skillConfig.typ == "atk" then
@@ -123,30 +126,30 @@ function BattleUI:SetOwnInfo(charData,newPos)
             end
 
             --判断技能哪些可以用
-            local canUse = false
+            local canUse = true
             if self.battleManager.ownTurn then
                 -- 检查站位
-                local posRight = false
-                for index, pos in ipairs(skillConfig.pos) do
-                    if nowPos == pos then
-                        posRight = true
-                        break
-                    end
-                end
-                if posRight then
-                    if skillConfig.typ == "cure" then
-                        canUse = true
-                    else
-                        --检查被攻击的位置是否有人（需要考虑移动问题）
-                        for index, pos in ipairs(skillConfig.atkPos) do
-                            local charData = self.battleManager:GetCharByPos(false,pos)
-                            if charData ~= nil and charData.isDead == nil then
-                                canUse = true
-                                break
-                            end
-                        end
-                    end                    
-                end
+                -- local posRight = false
+                -- for index, pos in ipairs(skillConfig.pos) do
+                --     if nowPos == pos then
+                --         posRight = true
+                --         break
+                --     end
+                -- end
+                -- if posRight then
+                    -- if skillConfig.typ == "cure" then
+                    --     canUse = true
+                    -- else
+                    --     --检查被攻击的位置是否有人（需要考虑移动问题）
+                    --     for index, pos in ipairs(skillConfig.atkPos) do
+                    --         local charData = self.battleManager:GetCharByPos(false,pos)
+                    --         if charData ~= nil and charData.isDead == nil then
+                    --             canUse = true
+                    --             break
+                    --         end
+                    --     end
+                    -- end                    
+                -- end
             end
             self:SetOwnSkillEnable(i , canUse)
         end
@@ -219,22 +222,32 @@ end
 function BattleUI:RefreshChar(charData)
     local configData = ConfigManager:GetConfig("Character")
     local maxHp = configData[charData.uid].hp
+    local player = self.enemy[charData.pos]
     if charData.isOwn then
-        if charData.isDead then
-            CommonUtil.SetActive(self.own[charData.pos] , nil , false)
-            return
-        end
-        ImageLoader.SetImage(self.own[charData.pos],"Img" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
-        CommonUtil.SetText(self.own[charData.pos],"HpBar/Text" , charData.hp .. "/" .. maxHp)
-        CommonUtil.SetImageFillAmount(self.own[charData.pos], "HpBar/Image" , charData.hp/maxHp)
-    else
-        if charData.isDead then
-            CommonUtil.SetActive(self.enemy[charData.pos] , nil , false)
-            return
-        end
-        ImageLoader.SetImage(self.enemy[charData.pos],"Img" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
-        CommonUtil.SetText(self.enemy[charData.pos],"HpBar/Text" , charData.hp .. "/" .. maxHp)
-        CommonUtil.SetImageFillAmount(self.enemy[charData.pos] , "HpBar/Image" , charData.hp/maxHp)
+        player = self.own[charData.pos]
+    end
+    if charData.isDead then
+        CommonUtil.SetActive(player , nil , false)
+        return
+    end
+    CommonUtil.SetActive(player,"Img",true)
+    CommonUtil.SetActive(player,"Img2",false)
+    CommonUtil.SetActive(player,"HpBar",true)
+    CommonUtil.SetActive(player,"Select",true)
+    CommonUtil.SetActive(player,"Selected",false)
+    CommonUtil.SetActive(player,"SelectedCure",false)
+    CommonUtil.SetActive(player,"SelectedMove",false)
+    ImageLoader.SetImage(player,"Img" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
+    CommonUtil.SetText(player,"HpBar/Text" , charData.hp .. "/" .. maxHp)
+    CommonUtil.SetImageFillAmount(player, "HpBar/Image" , charData.hp/maxHp)
+end
+
+function BattleUI:RefreshAllChar()
+    for uuid, data in ipairs(self.battleManager.own) do
+        self:RefreshChar(data)
+    end
+    for uuid, data in ipairs(self.battleManager.enemy) do
+        self:RefreshChar(data)
     end
 end
 
@@ -302,7 +315,7 @@ function BattleUI:SetOwnSkillAllDisenable()
     end
 end
 
-function BattleUI:SetSkillSelect(index , skillConfig , ownPos)    
+function BattleUI:SetSkillSelect(index , skillConfig , nowOrderPos , newOrderPos)    
     for i = 1, 4 do
         CommonUtil.SetActive(self.root,"UI/Own/Skill/" .. i .. "/Select",false)
     end
@@ -314,18 +327,38 @@ function BattleUI:SetSkillSelect(index , skillConfig , ownPos)
     CommonUtil.SetActive(self.root,"UI/Own/Skill/" .. index .. "/Select",true)
 
     self:SetCharSelectedOff()
+
+    local isOwn , nowPos = self.battleManager:GetCampPos(newOrderPos)
+    local atkPos = {}
+
+    self.newOrderPos = newOrderPos
+
+    if newOrderPos ~= nil and newOrderPos ~= nowOrderPos and #skillConfig.atkPos~=4 then
+        local step = newOrderPos - nowOrderPos
+        for index, pos in ipairs(skillConfig.atkPos) do                
+            if skillConfig.typ == "cure" then
+                if skillConfig.range ~= "own" then
+                    pos = math.max(1 , math.min(4 ,pos - step))
+                end
+            else
+                pos = math.max(1 ,math.min(4 , pos + step))
+            end
+            table.insert(atkPos , pos)
+        end
+    else
+        atkPos = skillConfig.atkPos
+    end
+
     if skillConfig.typ == "cure" then
-        for key, pos in ipairs(skillConfig.atkPos) do
+        for key, pos in ipairs(atkPos) do
             if pos == 0 then
-                self:SetCharSelect(true , ownPos , "SelectedCure")
+                self:SetCharSelect(true , nowPos , "SelectedCure")
             else
                 self:SetCharSelect(true , pos , "SelectedCure")
             end
         end
     elseif skillConfig.typ == "atk" then
-        -- -- 增加移动后的攻击距离
-        -- local atkPos = self.battleManager:GetMoveAtkPos(true , ownPos , skillConfig)
-        for key, pos in ipairs(skillConfig.atkPos) do
+        for key, pos in ipairs(atkPos) do
             if not self.battleManager:GetCharByPos(false , pos).isDead then
                 self:SetCharSelect(false , pos , "Selected")
             end
@@ -333,14 +366,15 @@ function BattleUI:SetSkillSelect(index , skillConfig , ownPos)
     end
 end
 
-function BattleUI:SetCharTempMove(isOwn , nowPos , orderPos)
-    if orderPos == nil then
-        orderPos = self.battleManager:GetOrderPos(isOwn , nowPos)
+function BattleUI:SetCharTempMove(isOwn , nowPos , newOrderPos)
+    if newOrderPos == nil then
+        newOrderPos = self.battleManager:GetOrderPos(isOwn , nowPos)
     end
     local canMovePos = self.battleManager:GetCharTempMovePos(isOwn , nowPos)
     if #canMovePos == 0 then
         return
     end
+    self:SetCharSelectedOff()
     local charData = self.battleManager:GetCharByPos(isOwn , nowPos)
     local configData = ConfigManager:GetConfig("Character")
     local maxHp = configData[charData.uid].hp
@@ -349,7 +383,7 @@ function BattleUI:SetCharTempMove(isOwn , nowPos , orderPos)
     for index, pos in ipairs(canMovePos) do
         local player = allPos[pos]
         CommonUtil.SetActive(player,nil,true)
-        if pos ~= orderPos then
+        if pos ~= newOrderPos then
             CommonUtil.SetActive(player,"Img",false)
             CommonUtil.SetActive(player,"Img2",true)
             CommonUtil.SetActive(player,"HpBar",false)
@@ -378,8 +412,8 @@ function BattleUI:SetCharTempMove(isOwn , nowPos , orderPos)
             CommonUtil.SetImageFillAmount(player, "HpBar/Image" , charData.hp/maxHp)
         end        
     end
-    local camp,newPos = self.battleManager:GetCampPos(orderPos)
-    self:SetOwnInfo(charData , newPos)
+    self:SetOwnInfo(charData , newOrderPos)
+    self:SetSkillSelect()
 end
 
 function BattleUI:OnClickUseSkillToChar(uuid)
