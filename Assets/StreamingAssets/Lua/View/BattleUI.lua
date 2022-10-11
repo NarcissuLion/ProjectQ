@@ -4,6 +4,8 @@ setmetatable(BattleUI, ViewBase)
 
 BattleUI.instance = nil
 
+IMG_HERO_PATH = "Prefab/SpriteAssets/Character/"
+
 function BattleUI:Create(battleManager)
     local copy = ViewBase:Create({canClose = false})
     setmetatable(copy, self)
@@ -16,71 +18,49 @@ end
 function BattleUI:Init(battleManager)
     self.root = self:Add("Prefab/UI/Battle/BattleUI")
     self.battleManager = battleManager
-    self.own = {}
-    self.enemy = {}
+    self.hero = {}
+    self:CreatePlayer()
 end
 
-function BattleUI:CreatePlayer(isOwn , pos , charData)
-    local player
-    if isOwn then
-        local parent = CommonUtil.GetChild(self.root,"Character/Own")
-        self.own[pos] = GameUtil.CreatePrefabToParent("Prefab/Character/Player",parent,pos)
-        player = self.own[pos]
-        CommonUtil.AddButtonClick(player, "SelectedCure", BindFunction(self, self.OnClickUseSkillToChar, charData.uuid))
-        CommonUtil.AddButtonClick(player, "SelectedMove", BindFunction(self, self.OnSelectMove, pos))
-    else
-        local parent = CommonUtil.GetChild(self.root,"Character/Enemy")
-        self.enemy[pos] = GameUtil.CreatePrefabToParent("Prefab/Character/Player",parent,pos)
-        player = self.enemy[pos]
-        CommonUtil.AddButtonClick(player, "Btn", BindFunction(self, self.SetEnemyInfo, charData.uuid))
-        CommonUtil.AddButtonClick(player, "Selected", BindFunction(self, self.OnClickUseSkillToChar, charData.uuid))
-    end
-    ImageLoader.SetImage(player,"Img" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
-    CommonUtil.SetText(player,"HpBar/Text" , charData.hp .. "/" .. charData.hp)
-    CommonUtil.SetImageFillAmount(player,pos .. "/HpBar/Image" , charData.hp/charData.hp)
-    CommonUtil.SetActive(player,"Select" , false)
-    CommonUtil.SetActive(player,"Selected" , false)
+function BattleUI:CreatePlayer()
+    local parent = CommonUtil.GetChild(self.root,"Hero")
+    for i = 1, 8 do
+        self.hero[i] = GameUtil.CreatePrefabToParent("Prefab/Character/Player",parent,i)
+    end    
 end
 
 function BattleUI:SetRound(index)
     CommonUtil.SetText(self.root,"Top/RoundIndex","第"..index.."回合")
 end
 
-function BattleUI:SetOwnInfo(charData,newOrderPos)
+function BattleUI:SetOwnInfo(heroData,newPos)
     local ownInfo = CommonUtil.GetChild(self.root,"UI/Own")
-    CommonUtil.SetActive(ownInfo ,nil, charData ~= nil)
-    if charData == nil then
+    CommonUtil.SetActive(ownInfo ,nil, heroData ~= nil)
+    if heroData == nil then
         return
     end
-    CommonUtil.SetActive(ownInfo ,nil, charData.isDead == nil)
-    if charData.isDead ~= nil then
+    CommonUtil.SetActive(ownInfo ,nil, heroData.isDead == nil)
+    if heroData.isDead ~= nil then
         return
     end
 
-    local nowPos = charData.pos
-    local nowOrderPos = self.battleManager:GetOrderPos(true , charData.pos)
-    local newPos
-    local newChamp
-    if newOrderPos ~= nil then
-        newChamp, newPos = self.battleManager:GetCampPos(newOrderPos)
-    end
-    local configData = ConfigManager:GetConfig("Character")
-    local maxHp = configData[charData.uid].hp
+    local configData = ConfigManager:GetConfig("Hero")
+    local maxHp = configData[heroData.uid].hp
 
-    ImageLoader.SetImage(ownInfo,"Icon" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
-    CommonUtil.SetText(ownInfo,"Name" , charData.name)
-    CommonUtil.SetText(ownInfo,"Hp" ,"HP:" .. charData.hp .. "/" .. maxHp)
-    CommonUtil.SetText(ownInfo,"Speed" ,"SPD:" .. charData.spd)
-    CommonUtil.SetText(ownInfo,"Atk" ,"ATK:" .. charData.atk)
-    -- CommonUtil.SetActive(ownInfo, "Move",charData.move > 0)
-    -- CommonUtil.AddButtonClick(ownInfo, "Move", BindFunction(self, self.OnClickMove, charData))
+    ImageLoader.SetImage(ownInfo,"Icon" ,IMG_HERO_PATH..heroData.prefab)
+    CommonUtil.SetText(ownInfo,"Name" , heroData.name)
+    CommonUtil.SetText(ownInfo,"Hp" ,"HP:" .. heroData.hp .. "/" .. maxHp)
+    CommonUtil.SetText(ownInfo,"Speed" ,"SPD:" .. heroData.spd)
+    CommonUtil.SetText(ownInfo,"Atk" ,"ATK:" .. heroData.atk)
+    -- CommonUtil.SetActive(ownInfo, "Move",heroData.move > 0)
+    -- CommonUtil.AddButtonClick(ownInfo, "Move", BindFunction(self, self.OnClickMove, heroData))
     for i = 1, 4 do
-        local skillId = charData.skill[i]
+        local skillId = heroData.skill[i]
         CommonUtil.SetActive(ownInfo,"Skill/" .. i , skillId ~= nil)
         if skillId ~= nil then
             local skillConfig = ConfigManager:GetConfig("Skill")[skillId]
             CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/name", skillConfig.name)
-            CommonUtil.AddButtonClick(ownInfo,"Skill/"..i , BindFunction(self,self.SetSkillSelect,i,skillConfig,nowOrderPos,newOrderPos))
+            CommonUtil.AddButtonClick(ownInfo,"Skill/"..i , BindFunction(self,self.SetSkillSelect,i,skillConfig,heroData.pos,newPos))
             --射程
             if skillConfig.range == "own" then
                 CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/atkPos","射程:自己")
@@ -104,18 +84,9 @@ function BattleUI:SetOwnInfo(charData,newOrderPos)
                     end
                 end
                 CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/atkPos","射程:[" .. text .. "]")
+            elseif skillConfig.range == "all" then
+                CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/atkPos","射程:[all]")                
             end
-
-            -- --站位
-            -- local text = ""
-            -- for index, pos in ipairs(skillConfig.pos) do
-            --     if index == 1 then
-            --         text = text .. pos
-            --     else
-            --         text = text .. "," .. pos
-            --     end
-            -- end
-            -- CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/pos","站位:[" .. text .. "]")
 
             --伤害
             if skillConfig.typ == "atk" then
@@ -125,30 +96,33 @@ function BattleUI:SetOwnInfo(charData,newOrderPos)
             end
 
             --判断技能哪些可以用
-            local canUse = self.battleManager.ownTurn
+            local canUse = false
             if self.battleManager.ownTurn then
-                -- 检查站位
-                -- local posRight = false
-                -- for index, pos in ipairs(skillConfig.pos) do
-                --     if nowPos == pos then
-                --         posRight = true
-                --         break
-                --     end
-                -- end
-                -- if posRight then
-                    -- if skillConfig.typ == "cure" then
-                    --     canUse = true
-                    -- else
-                    --     --检查被攻击的位置是否有人（需要考虑移动问题）
-                    --     for index, pos in ipairs(skillConfig.atkPos) do
-                    --         local charData = self.battleManager:GetCharByPos(false,pos)
-                    --         if charData ~= nil and charData.isDead == nil then
-                    --             canUse = true
-                    --             break
-                    --         end
-                    --     end
-                    -- end                    
-                -- end
+                --检查被攻击的位置是否有人
+                if skillConfig.range == "own" then
+                    canUse = true
+                end
+                if skillConfig.range == "all" then
+                    canUse = true
+                end
+                local atkPos = self.battleManager:GetNowAtkPos(heroData.pos,newPos , skillConfig)
+                printJson(atkPos)
+                for index, pos in ipairs(atkPos) do
+                    local heroData = self.battleManager:GetHeroByPos(pos)
+                    if heroData ~= nil and heroData.isDead == nil then
+                        if skillConfig.typ == "cure" then
+                            if heroData.isOwn then
+                                canUse = true
+                                break                                
+                            end
+                        else
+                            if not heroData.isOwn then
+                                canUse = true
+                                break                                
+                            end
+                        end                        
+                    end
+                end
             end
             self:SetOwnSkillEnable(i , canUse)
         end
@@ -156,26 +130,24 @@ function BattleUI:SetOwnInfo(charData,newOrderPos)
 
 end
 
-
-
 function BattleUI:SetEnemyInfo(uuid)
     local enemyInfo = CommonUtil.GetChild(self.root,"UI/Enemy")
     CommonUtil.SetActive(enemyInfo ,nil, uuid ~= nil)
     if uuid == nil then
         return
     end
-    local charData = self.battleManager:GetCharData(uuid)
-    local configData = ConfigManager:GetConfig("Character")
-    local maxHp = configData[charData.uid].hp
+    local heroData = self.battleManager:GetHeroData(uuid)
+    local configData = ConfigManager:GetConfig("Hero")
+    local maxHp = configData[heroData.uid].hp
 
-    ImageLoader.SetImage(enemyInfo,"Icon" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
-    CommonUtil.SetText(enemyInfo,"Name" , charData.name)
-    CommonUtil.SetText(enemyInfo,"Hp" ,"HP:" .. charData.hp .. "/" .. maxHp)
-    CommonUtil.SetText(enemyInfo,"Hp" ,"SPD:" .. charData.spd)
-    CommonUtil.SetText(enemyInfo,"Hp" ,"ATK:" .. charData.atk)
+    ImageLoader.SetImage(enemyInfo,"Icon" ,IMG_HERO_PATH..heroData.prefab)
+    CommonUtil.SetText(enemyInfo,"Name" , heroData.name)
+    CommonUtil.SetText(enemyInfo,"Hp" ,"HP:" .. heroData.hp .. "/" .. maxHp)
+    CommonUtil.SetText(enemyInfo,"Hp" ,"SPD:" .. heroData.spd)
+    CommonUtil.SetText(enemyInfo,"Hp" ,"ATK:" .. heroData.atk)
 
     for i = 1, 4 do
-        local skillId = charData.skill[i]
+        local skillId = heroData.skill[i]
         CommonUtil.SetActive(enemyInfo,"Skill/" .. i , skillId ~= nil)
         if skillId ~= nil then
             local skillConfig = ConfigManager:GetConfig("Skill")
@@ -184,22 +156,12 @@ function BattleUI:SetEnemyInfo(uuid)
     end
 end
 
-function BattleUI:SetCharSelect(isOwn , pos ,state )
-    if isOwn then
-        CommonUtil.SetActive(self.own[pos],state , true)
-    else
-        CommonUtil.SetActive(self.enemy[pos],state , true)
-    end
+function BattleUI:SetHeroSelect(pos ,state )
+    CommonUtil.SetActive(self.hero[pos] , state , true)
 end
 
-function BattleUI:SetCharSelectOff()
-    for key, player in pairs(self.own) do
-        CommonUtil.SetActive(player,"Select" , false)
-        CommonUtil.SetActive(player,"Selected" , false)
-        CommonUtil.SetActive(player,"SelectedCure" , false)
-        CommonUtil.SetActive(player,"SelectedMove" , false)
-    end
-    for key, player in pairs(self.enemy) do
+function BattleUI:SetHeroSelectOff()
+    for key, player in pairs(self.hero) do
         CommonUtil.SetActive(player,"Select" , false)
         CommonUtil.SetActive(player,"Selected" , false)
         CommonUtil.SetActive(player,"SelectedCure" , false)
@@ -207,28 +169,22 @@ function BattleUI:SetCharSelectOff()
     end
 end
 
-function BattleUI:SetCharSelectedOff()
-    for key, player in pairs(self.own) do
-        CommonUtil.SetActive(player,"Selected" , false)
-        CommonUtil.SetActive(player,"SelectedCure" , false)
-    end
-    for key, player in pairs(self.enemy) do
+function BattleUI:SetHeroSelectedOff()
+    for key, player in pairs(self.hero) do
         CommonUtil.SetActive(player,"Selected" , false)
         CommonUtil.SetActive(player,"SelectedCure" , false)
     end
 end
 
-function BattleUI:RefreshChar(charData)
-    local configData = ConfigManager:GetConfig("Character")
-    local maxHp = configData[charData.uid].hp
-    local player = self.enemy[charData.pos]
-    if charData.isOwn then
-        player = self.own[charData.pos]
-    end
-    if charData.isDead then
+function BattleUI:RefreshHero(heroData)
+    local configData = ConfigManager:GetConfig("Hero")
+    local maxHp = configData[heroData.uid].hp
+    local player = self.hero[heroData.pos]
+    if heroData.isDead then
         CommonUtil.SetActive(player , nil , false)
         return
     end
+    CommonUtil.SetActive(player , nil , true)
     CommonUtil.SetActive(player,"Img",true)
     CommonUtil.SetActive(player,"Img2",false)
     CommonUtil.SetActive(player,"HpBar",true)
@@ -238,72 +194,50 @@ function BattleUI:RefreshChar(charData)
     CommonUtil.SetActive(player,"Selected",false)
     CommonUtil.SetActive(player,"SelectedCure",false)
     CommonUtil.SetActive(player,"SelectedMove",false)
-    ImageLoader.SetImage(player,"Img" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
-    CommonUtil.SetText(player,"HpBar/Text" , charData.hp .. "/" .. maxHp)
-    CommonUtil.SetImageFillAmount(player, "HpBar/Image" , charData.hp/maxHp)
-end
-
-function BattleUI:RefreshAllChar()
-    for uuid, data in pairs(self.battleManager.own) do
-        self:RefreshChar(data)
-    end
-    for uuid, data in pairs(self.battleManager.enemy) do
-        self:RefreshChar(data)
-    end
-end
-
-function BattleUI:ShowDamage(isOwn , pos , damage)
-    if isOwn then
-        CommonUtil.SetText(self.own[pos],"Damage" ,damage)
-        CommonUtil.DOLocalMoveY(self.own[pos],"Damage" , 380 , 1.6)
-        CommonUtil.DoTextFadeFromTo(self.own[pos],"Damage" , 1 , 0 ,1.6)
-        CommonUtil.DoImageColor(self.own[pos],"Img" ,Color.red , 0.2)
-        CommonUtil.DOShake(self.own[pos],"Img" , 0.2,10,10)        
-        AsyncCall(function ()
-            CommonUtil.DoImageColor(self.own[pos],"Img" ,Color.white, 0.2)
-        end , 0.2)
-        AsyncCall(function ()
-            CommonUtil.SetAnchoredPositionY(self.own[pos],"Damage" , 90)
-        end , 1.8)
+    ImageLoader.SetImage(player,"Img" ,IMG_HERO_PATH..heroData.prefab)
+    CommonUtil.SetText(player,"HpBar/Text" , heroData.hp .. "/" .. maxHp)
+    CommonUtil.SetImageFillAmount(player, "HpBar/Image" , heroData.hp/maxHp)
+    if heroData.isOwn then
+        CommonUtil.AddButtonClick(player, "SelectedCure", BindFunction(self, self.OnClickUseSkillToHero, heroData.uuid))
+        CommonUtil.AddButtonClick(player, "SelectedMove", BindFunction(self, self.OnSelectMove, heroData.pos))
     else
-        CommonUtil.SetText(self.enemy[pos],"Damage" ,damage)
-        CommonUtil.DOLocalMoveY(self.enemy[pos],"Damage" , 380 , 1.6)
-        CommonUtil.DoTextFadeFromTo(self.enemy[pos],"Damage" , 1 , 0 ,1.6)
-        CommonUtil.DoImageColor(self.enemy[pos],"Img" ,Color.red, 0.2)
-        CommonUtil.DOShake(self.enemy[pos],"Img" , 0.2,10,10)
-        AsyncCall(function ()
-            CommonUtil.DoImageColor(self.enemy[pos],"Img" ,Color.white, 0.2)
-        end , 0.2)
-        AsyncCall(function ()
-            CommonUtil.SetAnchoredPositionY(self.enemy[pos],"Damage" , 90)
-        end , 1.8)
+        CommonUtil.AddButtonClick(player, "Btn", BindFunction(self, self.SetEnemyInfo, heroData.uuid))
+        CommonUtil.AddButtonClick(player, "Selected", BindFunction(self, self.OnClickUseSkillToHero, heroData.uuid))
     end
 end
 
-function BattleUI:ShowCure(isOwn , pos , cure)
-    if isOwn then
-        CommonUtil.SetText(self.own[pos],"Cure" ,"+" .. cure)
-        CommonUtil.DOLocalMoveY(self.own[pos],"Cure" , 380 , 1.6)
-        CommonUtil.DoTextFadeFromTo(self.own[pos],"Cure" , 1 , 0 ,1.6)
-        CommonUtil.DoImageColor(self.own[pos],"Img" ,Color.green , 0.2)
-        AsyncCall(function ()
-            CommonUtil.DoImageColor(self.own[pos],"Img" ,Color.white, 0.2)
-        end , 0.2)
-        AsyncCall(function ()
-            CommonUtil.SetAnchoredPositionY(self.own[pos],"Cure" , 90)
-        end , 1.8)
-    else
-        CommonUtil.SetText(self.enemy[pos],"Cure" ,"+" .. cure)
-        CommonUtil.DOLocalMoveY(self.enemy[pos],"Cure" , 380 , 1.6)
-        CommonUtil.DoTextFadeFromTo(self.enemy[pos],"Cure" , 1 , 0 ,1.6)
-        CommonUtil.DoImageColor(self.enemy[pos],"Img" ,Color.green , 0.2)
-        AsyncCall(function ()
-            CommonUtil.DoImageColor(self.enemy[pos],"Img" ,Color.white, 0.2)
-        end , 0.2)
-        AsyncCall(function ()
-            CommonUtil.SetAnchoredPositionY(self.enemy[pos],"Cure" , 90)
-        end , 1.8)
+function BattleUI:RefreshAllHero()
+    for uuid, data in pairs(self.battleManager.hero) do
+        self:RefreshHero(data)
     end
+end
+
+function BattleUI:ShowDamage(pos , damage)
+    CommonUtil.SetText(self.hero[pos],"Damage" ,damage)
+    CommonUtil.DOLocalMoveY(self.hero[pos],"Damage" , 380 , 1.6)
+    CommonUtil.DoTextFadeFromTo(self.hero[pos],"Damage" , 1 , 0 ,1.6)
+    CommonUtil.DoImageColor(self.hero[pos],"Img" ,Color.red , 0.2)
+    CommonUtil.DOShake(self.hero[pos],"Img" , 0.2,10,10)        
+    AsyncCall(function ()
+        CommonUtil.DoImageColor(self.hero[pos],"Img" ,Color.white, 0.2)
+    end , 0.2)
+    AsyncCall(function ()
+        CommonUtil.SetAnchoredPositionY(self.hero[pos],"Damage" , 90)
+    end , 1.8)
+    
+end
+
+function BattleUI:ShowCure(pos , cure)
+    CommonUtil.SetText(self.hero[pos],"Cure" ,"+" .. cure)
+    CommonUtil.DOLocalMoveY(self.hero[pos],"Cure" , 380 , 1.6)
+    CommonUtil.DoTextFadeFromTo(self.hero[pos],"Cure" , 1 , 0 ,1.6)
+    CommonUtil.DoImageColor(self.hero[pos],"Img" ,Color.green , 0.2)
+    AsyncCall(function ()
+        CommonUtil.DoImageColor(self.hero[pos],"Img" ,Color.white, 0.2)
+    end , 0.2)
+    AsyncCall(function ()
+        CommonUtil.SetAnchoredPositionY(self.hero[pos],"Cure" , 90)
+    end , 1.8)
 end
 
 function BattleUI:SetOwnSkillEnable(index , canUse)
@@ -316,7 +250,7 @@ function BattleUI:SetOwnSkillAllDisenable()
     end
 end
 
-function BattleUI:SetSkillSelect(index , skillConfig , nowOrderPos , newOrderPos)    
+function BattleUI:SetSkillSelect(index , skillConfig , nowPos , newPos)    
     for i = 1, 4 do
         CommonUtil.SetActive(self.root,"UI/Own/Skill/" .. i .. "/Select",false)
     end
@@ -327,46 +261,47 @@ function BattleUI:SetSkillSelect(index , skillConfig , nowOrderPos , newOrderPos
     self.selectSkillIndex = index
     CommonUtil.SetActive(self.root,"UI/Own/Skill/" .. index .. "/Select",true)
 
-    self:SetCharSelectedOff()
-    self.newOrderPos = newOrderPos
+    self:SetHeroSelectedOff()
+    self.newPos = newPos
 
-    local isOwn , nowPos = self.battleManager:GetCampPos(nowOrderPos)
-    local atkPos = self.battleManager:GetNowAtkPos(nowOrderPos , newOrderPos , skillConfig)
+    local atkPos = self.battleManager:GetNowAtkPos(nowPos , newPos , skillConfig)
     if skillConfig.typ == "cure" then
         for key, pos in ipairs(atkPos) do
             if pos == 0 then
-                self:SetCharSelect(true , nowPos , "SelectedCure")
+                self:SetHeroSelect(nowPos , "SelectedCure")
             else
-                self:SetCharSelect(true , pos , "SelectedCure")
-            end
+                local heroData = self.battleManager:GetHeroByPos(pos)
+                if not heroData.isDead and heroData.isOwn then
+                    self:SetHeroSelect(pos , "SelectedCure")
+                end
+            end            
         end
     elseif skillConfig.typ == "atk" then
         for key, pos in ipairs(atkPos) do
-            if not self.battleManager:GetCharByPos(false , pos).isDead then
-                self:SetCharSelect(false , pos , "Selected")
+            local heroData = self.battleManager:GetHeroByPos(pos)
+            if not heroData.isDead and not heroData.isOwn then
+                self:SetHeroSelect(pos , "Selected")
             end
         end
     end
 end
 
-function BattleUI:SetCharTempMove(isOwn , nowPos , newOrderPos)
-    if newOrderPos == nil then
-        newOrderPos = self.battleManager:GetOrderPos(isOwn , nowPos)
+function BattleUI:SetHeroTempMove(nowPos , newPos)
+    if newPos == nil then
+        newPos = nowPos
     end
-    local canMovePos = self.battleManager:GetCharTempMovePos(isOwn , nowPos)
+    local canMovePos = self.battleManager:GetHeroTempMovePos(nowPos)
     if #canMovePos == 0 then
         return
     end
-    self:SetCharSelectedOff()
-    local charData = self.battleManager:GetCharByPos(isOwn , nowPos)
-    local configData = ConfigManager:GetConfig("Character")
-    local maxHp = configData[charData.uid].hp
-    local allPos = {self.own[4],self.own[3],self.own[2],self.own[1],
-                   self.enemy[1],self.enemy[2],self.enemy[3],self.enemy[4]}
+    self:SetHeroSelectedOff()
+    local heroData = self.battleManager:GetHeroByPos(nowPos)
+    local configData = ConfigManager:GetConfig("Hero")
+    local maxHp = configData[heroData.uid].hp
     for index, pos in ipairs(canMovePos) do
-        local player = allPos[pos]
+        local player = self.hero[pos]
         CommonUtil.SetActive(player,nil,true)
-        if pos ~= newOrderPos then
+        if pos ~= newPos then
             CommonUtil.SetActive(player,"Img",false)
             CommonUtil.SetActive(player,"Img2",true)
             CommonUtil.SetActive(player,"HpBar",false)
@@ -377,8 +312,8 @@ function BattleUI:SetCharTempMove(isOwn , nowPos , newOrderPos)
             CommonUtil.SetActive(player,"Selected",false)
             CommonUtil.SetActive(player,"SelectedCure",false)
             CommonUtil.SetActive(player,"SelectedMove",true)
-            ImageLoader.SetImage(player,"Img2" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
-            CommonUtil.AddButtonClick(player, "SelectedMove", BindFunction(self, self.SetCharTempMove, isOwn , nowPos , pos))
+            ImageLoader.SetImage(player,"Img2" ,IMG_HERO_PATH..heroData.prefab)
+            CommonUtil.AddButtonClick(player, "SelectedMove", BindFunction(self, self.SetHeroTempMove , nowPos , pos))
         else
             CommonUtil.SetActive(player,"Img",true)
             CommonUtil.SetActive(player,"Img2",false)
@@ -390,36 +325,35 @@ function BattleUI:SetCharTempMove(isOwn , nowPos , newOrderPos)
             CommonUtil.SetActive(player,"Selected",false)
             CommonUtil.SetActive(player,"SelectedCure",false)
             CommonUtil.SetActive(player,"SelectedMove",false)
-            ImageLoader.SetImage(player,"Img" ,"Prefab/SpriteAssets/Character/"..charData.prefab)
-            CommonUtil.SetText(player,"HpBar/Text" , charData.hp .. "/" .. maxHp)
-            CommonUtil.SetImageFillAmount(player, "HpBar/Image" , charData.hp/maxHp)
+            ImageLoader.SetImage(player,"Img" ,IMG_HERO_PATH..heroData.prefab)
+            CommonUtil.SetText(player,"HpBar/Text" , heroData.hp .. "/" .. maxHp)
+            CommonUtil.SetImageFillAmount(player, "HpBar/Image" , heroData.hp/maxHp)
         end        
     end
-    self:SetOwnInfo(charData , newOrderPos)
+    self:SetOwnInfo(heroData , newPos)
     self:SetSkillSelect()
 end
 
-function BattleUI:OnClickUseSkillToChar(uuid)
-    self.battleManager:UseSkillToChar(self.selectSkillIndex , uuid)
+function BattleUI:OnClickUseSkillToHero(uuid)
+    self.battleManager:UseSkillToHero(self.selectSkillIndex , uuid)
 end
 
-function BattleUI:OnClickMove(charData)
+function BattleUI:OnClickMove(heroData)
     self:SetSkillSelect()
-    if charData.move == 0 then
-        ViewUtils.ShowHint("此角色不能移动",1)
+    if heroData.move == 0 then
         return
     end
-    self:ShowMoveSelect(charData)
+    self:ShowMoveSelect(heroData)
 end
 
-function BattleUI:ShowMoveSelect(charData)
-    self:SetCharSelectedOff()
-    local pos = charData.pos 
-    local step = charData.move
+function BattleUI:ShowMoveSelect(heroData)
+    self:SetHeroSelectedOff()
+    local pos = heroData.pos 
+    local step = heroData.move
     if step == 1 then
         for i = 1, 3 do
             if i == pos - step or i == pos + step then
-                self:SetCharSelect(true , i , "SelectedMove")
+                self:SetHeroSelect(i , "SelectedMove")
             end
         end
     end
@@ -427,7 +361,7 @@ function BattleUI:ShowMoveSelect(charData)
     if step == 2 then
         for i = 1, 3 do
             if i ~= pos then
-                self:SetCharSelect(true , i , "SelectedMove")
+                self:SetHeroSelect(i , "SelectedMove")
             end
         end
     end
@@ -437,29 +371,15 @@ function BattleUI:OnSelectMove(moveTo)
     self.battleManager:OwnMove(moveTo)
 end
 
-function BattleUI:ExchangeChar(isOwn ,pos1 , pos2)
-    if isOwn then
-        --播动画
-        local position1 = self.own[pos1].transform.position
-        local position2 = self.own[pos2].transform.position
-        CommonUtil.DOMove(self.own[pos1],nil , position2 , 0.8)
-        CommonUtil.DOMove(self.own[pos2],nil , position1 , 0.8)
-        --还原
-        AsyncCall(function ()
-            self.own[pos1].transform.position = position1
-            self.own[pos2].transform.position = position2
-        end,0.8)
-    else
-        --播动画
-        local localPos1 = self.enemy[pos1].transform.localPosition
-        local localPos2 = self.enemy[pos2].transform.localPosition
-        CommonUtil.DOLocalMove(self.enemy[pos1],nil , localPos2 , 0.8)
-        CommonUtil.DOLocalMove(self.enemy[pos2],nil , localPos1 , 0.8)
-        --还原
-        AsyncCall(function ()
-            self.enemy[pos1].transform.localPosition = localPos1
-            self.enemy[pos2].transform.localPosition = localPos2
-        end,0.8)
-    end
-    
+function BattleUI:ExchangeHero(pos1 , pos2)
+    --播动画
+    local position1 = self.hero[pos1].transform.position
+    local position2 = self.hero[pos2].transform.position
+    CommonUtil.DOMove(self.hero[pos1],nil , position2 , 0.8)
+    CommonUtil.DOMove(self.hero[pos2],nil , position1 , 0.8)
+    --还原
+    AsyncCall(function ()
+        self.hero[pos1].transform.position = position1
+        self.hero[pos2].transform.position = position2
+    end,0.8) 
 end

@@ -33,14 +33,11 @@ end
 
 function RoundStartState:InitSortBattleList()
     self.battle.sortBattleList = {}
-    for uuid, data in pairs(self.battle.own) do
-        table.insert(self.battle.sortBattleList , uuid)
-    end
-    for uuid, data in pairs(self.battle.enemy) do
+    for uuid, data in pairs(self.battle.hero) do
         table.insert(self.battle.sortBattleList , uuid)
     end
 
     table.sort(self.battle.sortBattleList,function (a,b)
-        return self.battle:GetCharSpd(a) > self.battle:GetCharSpd(b)
+        return self.battle:GetHeroSpd(a) > self.battle:GetHeroSpd(b)
     end)
 end

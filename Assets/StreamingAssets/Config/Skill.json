@@ -16,28 +16,28 @@
 "a3":{
 	"typ":"atk",
 	"name":"攻击3",
-	"atkPos":[1,2],
+	"atkPos":[5,6],
 	"dmg":[10,20],
 	"range":"aoe"
 },
 "a4":{
 	"typ":"atk",
 	"name":"攻击4",
-	"atkPos":[1,2,3,4],
+	"atkPos":[0],
 	"dmg":[40,60],
-	"range":"aoe"
+	"range":"all"
 },
 "a5":{
 	"typ":"atk",
 	"name":"攻击5",
-	"atkPos":[3,4],
+	"atkPos":[7,8],
 	"dmg":[70,80],
 	"range":"one"
 },
 "a6":{
 	"typ":"atk",
 	"name":"攻击6",
-	"atkPos":[1,2],
+	"atkPos":[1,2,3,4],
 	"dmg":[70,80],
 	"range":"one"
 },
@@ -58,8 +58,8 @@
 "c3":{
 	"typ":"cure",
 	"name":"治疗3",
-	"atkPos":[1,2,3,4],
+	"atkPos":[0],
 	"dmg":[5,10],
-	"range":"aoe"
+	"range":"all"
 }
 }

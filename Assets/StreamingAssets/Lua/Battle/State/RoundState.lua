@@ -13,7 +13,7 @@ end
 
 function RoundState:OnEnter()
     print("第"..self.battle.roundIndex .. "回合中...")
-    self.battle.view:SetCharSelectOff()
+    self.battle.view:SetHeroSelectOff()
     self:DoNext()
 end
 
@@ -37,79 +37,57 @@ function RoundState:DoNext()
 
 
     local id = self.battle.sortBattleList[1]
-    local charData = self.battle:GetCharData(id)
-    if charData.isDead then
+    local heroData = self.battle:GetHeroData(id)
+    if heroData.isDead then
         self:Pass()
         return
     end
 
-    if charData.isOwn then
-        self:DoOwn(charData)
+    if heroData.isOwn then
+        self:DoOwn(heroData)
     else
-        self:DoEnemy(charData)
+        self:DoEnemy(heroData)
     end
 end
 
-function RoundState:DoOwn(charData)
+function RoundState:DoOwn(heroData)
     --显示信息
     self.battle.ownTurn = true
-    self.battle.ownUuid = charData.uuid
-    self.battle.view:SetOwnInfo(charData)
-    self.battle.view:SetCharSelect(true , charData.pos , "Select")
-    self.battle.view:SetCharTempMove(true , charData.pos)
+    self.battle.ownUuid = heroData.uuid
+    self.battle.view:SetOwnInfo(heroData)
+    self.battle.view:SetHeroSelect(heroData.pos , "Select")
+    self.battle.view:SetHeroTempMove(heroData.pos)
 end
 
-function RoundState:DoEnemy(charData)
-    self.battle.view:SetCharSelect(false , charData.pos , "Select")
-    local skillId = self:RandomEnemyAction(charData)
+function RoundState:DoEnemy(heroData)
+    self.battle.view:SetHeroSelect( heroData.pos , "Select")
+    local skillId = self:RandomEnemyAction(heroData)
     if skillId ~= nil then
-        local isOwn ,pos = self:RandomAtkPos(skillId , charData.pos)
-        if type(pos) == "number" then
+        local atkPos = self:RandomAtkPos(skillId , heroData.pos)
+        for index, p in ipairs(atkPos) do
             -- 选中对象
-            self.battle.view:SetCharSelect(isOwn , pos ,"Selected" )
-            local dmg = self:GetDmg(charData , skillId)
-            -- 等1s
-            AsyncCall(function ()
+            self.battle.view:SetHeroSelect(p ,"Selected" )
+        end
+        
+        -- 等1s
+        AsyncCall(function ()
+            for index, p in ipairs(atkPos) do
+                local dmg = self:GetDmg(heroData , skillId)                
                 -- 显示伤害
                 if dmg > 0 then
-                    self.battle.view:ShowCure(isOwn , pos , dmg)
+                    self.battle.view:ShowCure(p , dmg)
                 else
-                    self.battle.view:ShowDamage(isOwn , pos , dmg)
+                    self.battle.view:ShowDamage(p , dmg)
                 end
                 -- 扣血，刷新界面ui
-                self.battle:AddCharHp(isOwn ,pos , dmg)
-                self.battle.view:RefreshChar(self.battle:GetCharByPos(isOwn , pos))
-                self.battle.view:SetOwnInfo(self.battle:GetCharData(self.battle.ownUuid))
-                AsyncCall(function ()
-                    self:Pass()
-                end , 1)
-            end , 1)
-        else
-            for index, p in ipairs(pos) do
-                -- 选中对象
-                self.battle.view:SetCharSelect(isOwn , p ,"Selected" )
+                self.battle:AddHeroHp(p , dmg)
+                self.battle.view:RefreshHero(self.battle:GetHeroByPos(p))
+                self.battle.view:SetOwnInfo(self.battle:GetHeroData(self.battle.ownUuid))
             end
-            
-            -- 等1s
             AsyncCall(function ()
-                for index, p in ipairs(pos) do
-                    local dmg = self:GetDmg(charData , skillId)                
-                    -- 显示伤害
-                    if dmg > 0 then
-                        self.battle.view:ShowCure(isOwn , p , dmg)
-                    else
-                        self.battle.view:ShowDamage(isOwn , p , dmg)
-                    end
-                    -- 扣血，刷新界面ui
-                    self.battle:AddCharHp(isOwn ,p , dmg)
-                    self.battle.view:RefreshChar(self.battle:GetCharByPos(isOwn , p))
-                    self.battle.view:SetOwnInfo(self.battle:GetCharData(self.battle.ownUuid))
-                end
-                AsyncCall(function ()
-                    self:Pass()
-                end , 1)
+                self:Pass()
             end , 1)
-        end
+        end , 1)
     else
         --跳过或者移动
         self:Pass()
@@ -118,7 +96,7 @@ end
 
 function RoundState:Pass()
     table.remove(self.battle.sortBattleList,1)
-    self.battle.view:SetCharSelectOff()
+    self.battle.view:SetHeroSelectOff()
     if self:IsGameOver() then
         self.battle:ChangeState(BattleState.BattleEnd)
         return
@@ -127,9 +105,13 @@ function RoundState:Pass()
     self:DoNext()
 end
 
-function RoundState:RandomEnemyAction(charData)
-    local hpIsFull = self:EnemyHpIsFull(charData)
-    local skills = charData.skill
+function RoundState:RandomEnemyAction(heroData)
+    local hpIsFull = self:HpIsFull(heroData)
+    local heroSkill = heroData.skill
+    local skills = {}
+    for index, value in ipairs(heroSkill) do
+        table.insert(skills , value)
+    end
     while #skills >= 1 do
         local index = math.random(1 , #skills)
         local skillId = skills[index]
@@ -139,42 +121,35 @@ function RoundState:RandomEnemyAction(charData)
             printError("技能" .. skillId .. "表中缺失")
             return
         end
-        -- 检查站位
-        -- local posRight = false
-        -- for index, pos in ipairs(skillConfig.pos) do
-        --     if charData.pos == pos then
-        --         posRight = true
-        --         break
-        --     end
-        -- end
-        -- if not posRight then
-        --     table.remove(skills,index)
-        -- else
-            
-            --检查治疗
-            if skillConfig.typ == "cure" and skillConfig.range == "own" and hpIsFull then
-                table.remove(skills,index)
-            else
-                if skillConfig.typ == "cure" then
-                    for index, pos in ipairs(skillConfig.atkPos) do
-                        local charData = self.battle:GetCharByPos(false,pos)
-                        if charData ~= nil and charData.isDead == nil and not self:EnemyHpIsFull(charData) then
-                            return skillId
-                        end
-                    end
-                end
-            
-                --检查被攻击的位置是否有人
+        --检查治疗
+        if skillConfig.typ == "cure" and skillConfig.range == "own" and hpIsFull then
+            table.remove(skills,index)
+        else
+            if skillConfig.range == "all" then
+                return skillId
+            end
+
+            if skillConfig.typ == "cure" then
                 for index, pos in ipairs(skillConfig.atkPos) do
-                    local charData = self.battle:GetCharByPos(true,pos)
-                    if charData ~= nil and charData.isDead == nil then
+                    local truePos = heroData.pos - pos
+                    local heroData = self.battle:GetHeroByPos(truePos)
+                    if heroData ~= nil and heroData.isDead == nil and not heroData.isOwn and not self:HpIsFull(heroData) then
                         return skillId
                     end
                 end
-
-                table.remove(skills,index)
             end
-        -- end
+        
+            --检查被攻击的位置是否有人
+            for index, pos in ipairs(skillConfig.atkPos) do
+                local truePos = heroData.pos - pos
+                local heroData = self.battle:GetHeroByPos(truePos)
+                if heroData ~= nil and heroData.isDead == nil and heroData.isOwn then
+                    return skillId
+                end
+            end
+
+            table.remove(skills,index)
+        end
     end 
     return nil
 end
@@ -186,58 +161,49 @@ function RoundState:RandomAtkPos(skillId,selfPos)
         printError("技能" .. skillId .. "表中缺失")
         return
     end
-    if skillConfig.typ == "atk" then
-        local tmp = self:GetAtkPosHaveChar(skillConfig.atkPos,true)
-        local posArr = {}
-        for index, pos in ipairs(tmp) do
-            local charData = self.battle:GetCharByPos(true , pos)
-            local isDead = true
-            if charData ~= nil then
-                isDead = charData.isDead
-            end
-            if not isDead then
-                table.insert(posArr , pos)
+
+    if skillConfig.range == "own" then
+        return selfPos
+    elseif skillConfig.range == "all" then
+        if skillConfig.typ == "atk" then
+            return self.battle:GetAllOwnPos()
+        elseif skillConfig.typ == "cure" then
+            return self.battle:GetAllEnemyPos()
+        end
+    elseif skillConfig.range == "aoe" or skillConfig.range == "one" then
+        local trueAtkPos = {}
+        for index, pos in ipairs(skillConfig.atkPos) do
+            local truePos = selfPos - pos
+            if truePos >= 1 and truePos <= 8 then
+                table.insert(trueAtkPos , truePos)
             end
         end
-        if skillConfig.range == "one" then
-            return true , self:GetRandomOne(posArr)
-        elseif skillConfig.range == "aoe" then
-            return true , posArr
-        end
-    elseif skillConfig.typ == "cure" then
-        local tmp = self:GetAtkPosHaveChar(skillConfig.atkPos,false)
         local posArr = {}
-        for index, pos in ipairs(tmp) do
-            local charData = self.battle:GetCharByPos(true , pos)
-            local isDead = true
-            if charData ~= nil then
-                isDead = charData.isDead
-            end
-            if not isDead then
+        for index, pos in ipairs(trueAtkPos) do
+            local heroData = self.battle:GetHeroByPos(pos)
+            if heroData ~= nil and heroData.isDead == nil then
                 table.insert(posArr , pos)
             end
         end
 
-        if skillConfig.range == "one" then
-            return false , self:GetRandomOne(posArr)
-        elseif skillConfig.range == "aoe" then
-            return false , posArr
-        elseif skillConfig.range == "own" then
-            return false , selfPos
+        if skillConfig.range == "aoe" then
+            return posArr
+        else
+            return self:GetRandomOne(posArr)
         end
     end
 end
 
-function RoundState:EnemyHpIsFull(charData)
-    local maxHp = self.battle:GetCharMaxHp(charData.uid)
-    return charData.hp >= maxHp
+function RoundState:HpIsFull(heroData)
+    local maxHp = self.battle:GetHeroMaxHp(heroData.uid)
+    return heroData.hp >= maxHp
 end
 
-function RoundState:GetAtkPosHaveChar(atkPos,isOwn)
+function RoundState:GetAtkPosHaveHero(atkPos)
     local tmp = {}
     for _, pos in ipairs(atkPos) do
-        local charData = self.battle:GetCharByPos(isOwn,pos)
-        if charData ~= nil then
+        local heroData = self.battle:GetHeroByPos(pos)
+        if heroData ~= nil then
             table.insert(tmp , pos)
         end                
     end
@@ -248,12 +214,13 @@ function RoundState:GetRandomOne(arr)
     if #arr == 1 then
         return arr
     end
-
+    local tmp = {}
     local index = math.random(1 , #arr)
-    return arr[index]
+    table.insert(tmp , arr[index])
+    return tmp
 end
 
-function RoundState:GetDmg(charData , skillId)
+function RoundState:GetDmg(heroData , skillId)
     local skillConfig = ConfigManager:GetConfig("Skill")    
     local skillConfig = skillConfig[skillId]
     if skillConfig == nil then
@@ -261,95 +228,87 @@ function RoundState:GetDmg(charData , skillId)
         return
     end
     if skillConfig.typ == "atk" then
-        return -math.ceil(math.random(skillConfig.dmg[1] ,skillConfig.dmg[2] ) * 0.01 * charData.atk)
+        return -math.ceil(math.random(skillConfig.dmg[1] ,skillConfig.dmg[2] ) * 0.01 * heroData.atk)
     elseif skillConfig.typ == "cure" then
         return math.random(skillConfig.dmg[1] ,skillConfig.dmg[2] )
     end
 end
 
 function RoundState:OwnUseSkill(skillIndex,targetUuid)
-    local function Atk(charData , nowOrderPos , newOrderPos)
-        local skillId = charData.skill[skillIndex]
+    local function Atk(heroData , nowPos , newPos)
+        local skillId = heroData.skill[skillIndex]
         local skillConfig = ConfigManager:GetConfig("Skill")
         skillConfig = skillConfig[skillId]
-
         if skillConfig.typ == "atk" then
-            if skillConfig.range == "aoe" then
-                local atkPos = self.battle:GetNowAtkPos(nowOrderPos , newOrderPos , skillConfig)
+            if skillConfig.range == "aoe" or skillConfig.range == "all" then
+                local atkPos = self.battle:GetNowAtkPos(nowPos , newPos , skillConfig)
                 for index, p in ipairs(atkPos) do
-                    local dmg = self:GetDmg(charData , skillId)                
-                    self.battle.view:ShowDamage(false , p , dmg)
-                    self.battle:AddCharHp(false ,p , dmg)
-                    self.battle.view:RefreshChar(self.battle:GetCharByPos(false , p))
+                    local dmg = self:GetDmg(heroData , skillId)                
+                    self.battle.view:ShowDamage( p , dmg)
+                    self.battle:AddHeroHp(p , dmg)
+                    self.battle.view:RefreshHero(self.battle:GetHeroByPos(p))
                 end
             elseif skillConfig.range == "one" then
-                local targetCharData = self.battle:GetCharData(targetUuid)            
-                local dmg = self:GetDmg(charData , skillId)
-                self.battle.view:ShowDamage(false , targetCharData.pos , dmg)
-                self.battle:AddCharHp(false ,targetCharData.pos , dmg)
-                self.battle.view:RefreshChar(self.battle:GetCharByPos(false , targetCharData.pos))
+                local targetHeroData = self.battle:GetHeroData(targetUuid)            
+                local dmg = self:GetDmg(heroData , skillId)
+                self.battle.view:ShowDamage(targetHeroData.pos , dmg)
+                self.battle:AddHeroHp(targetHeroData.pos , dmg)
+                self.battle.view:RefreshHero(self.battle:GetHeroByPos(targetHeroData.pos))
             end
 
         elseif skillConfig.typ == "cure" then
-            if skillConfig.range == "aoe" then
-                local atkPos = self.battle:GetNowAtkPos(nowOrderPos , newOrderPos , skillConfig)
+            if skillConfig.range == "aoe" or skillConfig.range == "all" then
+                local atkPos = self.battle:GetNowAtkPos(nowPos , newPos , skillConfig)
                 for index, p in ipairs(atkPos) do
-                    local dmg = self:GetDmg(charData , skillId)                
-                    self.battle.view:ShowCure(true , p , dmg)
-                    self.battle:AddCharHp(true ,p , dmg)
-                    self.battle.view:RefreshChar(self.battle:GetCharByPos(true , p))
+                    local dmg = self:GetDmg(heroData , skillId)                
+                    self.battle.view:ShowCure(p , dmg)
+                    self.battle:AddHeroHp(p , dmg)
+                    self.battle.view:RefreshHero(self.battle:GetHeroByPos(p))
                 end
             elseif skillConfig.range == "one" then
-                local targetCharData = self.battle:GetCharData(targetUuid)            
-                local dmg = self:GetDmg(charData , skillId)
-                self.battle.view:ShowCure(true , targetCharData.pos , dmg)
-                self.battle:AddCharHp(true ,targetCharData.pos , dmg)
-                self.battle.view:RefreshChar(self.battle:GetCharByPos(true , targetCharData.pos))
+                local targetHeroData = self.battle:GetHeroData(targetUuid)            
+                local dmg = self:GetDmg(heroData , skillId)
+                self.battle.view:ShowCure(targetHeroData.pos , dmg)
+                self.battle:AddHeroHp(targetHeroData.pos , dmg)
+                self.battle.view:RefreshHero(self.battle:GetHeroByPos(targetHeroData.pos))
             elseif skillConfig.range == "own" then
-                local dmg = self:GetDmg(charData , skillId)
-                self.battle.view:ShowCure(true , charData.pos , dmg)
-                self.battle:AddCharHp(true ,charData.pos , dmg)
-                self.battle.view:RefreshChar(self.battle:GetCharByPos(true , charData.pos))
+                local dmg = self:GetDmg(heroData , skillId)
+                self.battle.view:ShowCure(heroData.pos , dmg)
+                self.battle:AddHeroHp(heroData.pos , dmg)
+                self.battle.view:RefreshHero(self.battle:GetHeroByPos(heroData.pos))
             end
         end       
     end
 
-
-    
-    
     self.battle.ownTurn = false
     local id = self.battle.sortBattleList[1]
-    local charData = self.battle:GetCharData(id) 
-    local nowOrderPos = self.battle:GetOrderPos(charData.isOwn , charData.pos)
-    local newOrderPos = self.battle.view.newOrderPos
-    local skillId = charData.skill[skillIndex]
+    local heroData = self.battle:GetHeroData(id) 
+    local nowPos = heroData.pos
+    local newPos = self.battle.view.newPos
+    local skillId = heroData.skill[skillIndex]
     local skillConfig = ConfigManager:GetConfig("Skill")
     skillConfig = skillConfig[skillId]
-    if newOrderPos == nil or nowOrderPos == newOrderPos or skillConfig.range == "own" or #skillConfig.atkPos == 4 then
-        Atk(charData , nowOrderPos , newOrderPos)
-        self.battle.view:RefreshAllChar()
+    if newPos == nil or nowPos == newPos or skillConfig.range == "own" or skillConfig.range == "all" then
+        Atk(heroData , nowPos , newPos)
+        self.battle.view:RefreshAllHero()
         AsyncCall(function ()
-            self.battle.view:SetOwnInfo(charData)
+            self.battle.view:SetOwnInfo(heroData)
             self:Pass()
         end , 1)
     else
-        local isOwn , newPos = self.battle:GetCampPos(newOrderPos)
-        local nowPositon = self.battle.view.own[charData.pos].transform.position
-        local targetPos= self.battle.view.own[newPos].transform.position
-        if not isOwn then
-            targetPos = self.battle.view.enemy[newPos].transform.position
-        end
-        CommonUtil.DOMove(self.battle.view.own[charData.pos],nil , targetPos , 0.8)
-        self.battle.view:RefreshAllChar()
+        local nowPositon = self.battle.view.hero[heroData.pos].transform.position
+        local targetPos= self.battle.view.hero[newPos].transform.position
+        CommonUtil.DOMove(self.battle.view.hero[heroData.pos],nil , targetPos , 0.8)
+        self.battle.view:RefreshAllHero()
         AsyncCall(function ()
-            Atk(charData, nowOrderPos , newOrderPos)
+            Atk(heroData, nowPos , newPos)
+            self.battle.view.hero[heroData.pos].transform.position = nowPositon
+            self.battle:ExchangeHero(heroData.pos , newPos)
+            self.battle.view:RefreshAllHero()
             AsyncCall(function ()
-                CommonUtil.DOMove(self.battle.view.own[charData.pos],nil , nowPositon , 0.8)
-                AsyncCall(function ()
-                    self.battle.view:SetOwnInfo(charData)
-                    self:Pass()
-                end , 1)
-            end,0.5)
+                self.battle.view:SetOwnInfo(heroData)
+                self:Pass()
+            end , 1)
         end , 0.8)
     end
 end
@@ -357,31 +316,28 @@ end
 function RoundState:OwnMove(moveTo)
     self.battle.ownTurn = false
     local id = self.battle.sortBattleList[1]
-    local charData = self.battle:GetCharData(id)
-    local orgPos = charData.pos
-    self.battle.view:ExchangeChar(true , charData.pos , moveTo)
-    self.battle:ExchangeChar(true , charData.pos , moveTo)
+    local heroData = self.battle:GetHeroData(id)
+    local orgPos = heroData.pos
+    self.battle.view:ExchangeHero(heroData.pos , moveTo)
+    self.battle:ExchangeHero(heroData.pos , moveTo)
 
     AsyncCall(function ()
-        self.battle.view:RefreshChar(self.battle:GetCharByPos(true , orgPos))
-        self.battle.view:RefreshChar(self.battle:GetCharByPos(true , moveTo))
-        self.battle.view:SetOwnInfo(charData)
+        self.battle.view:RefreshHero(self.battle:GetHeroByPos(orgPos))
+        self.battle.view:RefreshHero(self.battle:GetHeroByPos(moveTo))
+        self.battle.view:SetOwnInfo(heroData)
         self:Pass()
     end , 0.8)
 end
 
 function RoundState:IsGameOver()
     local ownAllDead = true
-    for uuid, data in pairs(self.battle.own) do
-        if data.isDead == nil then
+    local enemyAllDead = true
+    for uuid, data in pairs(self.battle.hero) do
+        if data.isOwn and data.isDead == nil then
             ownAllDead = false
         end
-    end
-
-    local enemyAllDead = true
-    for uuid, data in pairs(self.battle.enemy) do
-        if data.isDead == nil then
-            enemyAllDead = false            
+        if not data.isOwn and data.isDead == nil then
+            enemyAllDead = false
         end
     end
 
@@ -397,10 +353,3 @@ function RoundState:IsGameOver()
 
     return false
 end
-
---待完成项：
--- 我方角色的面板刷新x
--- 角色攻击时的移动判断
--- 角色移动
--- bug我方操作时可重复点击x
--- 动画

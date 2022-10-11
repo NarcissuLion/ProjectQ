@@ -35,56 +35,52 @@ end
 function BattleStartState:AddPlayer()
     local config = self.battle.config
     local uuid = 1
-    self.battle.own = {}
-    self.battle.enemy = {}
+    self.battle.hero = {}
 
     for index, idArr in ipairs(config.BattlePlayer) do
         if index == 1 then
             for pos, id in ipairs(idArr) do
                 if id ~= "-1" then
-                    self.battle.own[uuid] = {}
+                    self.battle.hero[uuid] = {}
                     local charData = self:GetPlayerData(id)
-                    self.battle.own[uuid].isOwn = true
-                    self.battle.own[uuid].pos = pos
-                    self.battle.own[uuid].uid = id
-                    self.battle.own[uuid].uuid = uuid
-                    self.battle.own[uuid].name = charData.name
-                    self.battle.own[uuid].prefab = charData.prefab
-                    self.battle.own[uuid].hp = charData.hp
-                    self.battle.own[uuid].atk = charData.atk
-                    self.battle.own[uuid].spd = charData.spd
-                    self.battle.own[uuid].skill = charData.skill
-                    self.battle.own[uuid].move = charData.move
-                    self.battle.view:CreatePlayer(true , pos , self.battle.own[uuid])
+                    self.battle.hero[uuid].isOwn = true
+                    self.battle.hero[uuid].pos = pos
+                    self.battle.hero[uuid].uid = id
+                    self.battle.hero[uuid].uuid = uuid
+                    self.battle.hero[uuid].name = charData.name
+                    self.battle.hero[uuid].prefab = charData.prefab
+                    self.battle.hero[uuid].hp = charData.hp
+                    self.battle.hero[uuid].atk = charData.atk
+                    self.battle.hero[uuid].spd = charData.spd
+                    self.battle.hero[uuid].skill = charData.skill
                     uuid = uuid + 1
                 end
             end
         elseif index == 2 then
             for pos, id in ipairs(idArr) do
                 if id ~= "-1" then
-                    self.battle.enemy[uuid] = {}
+                    self.battle.hero[uuid] = {}
                     local charData = self:GetPlayerData(id)
-                    self.battle.enemy[uuid].isOwn = false
-                    self.battle.enemy[uuid].pos = pos
-                    self.battle.enemy[uuid].uid = id
-                    self.battle.enemy[uuid].uuid = uuid
-                    self.battle.enemy[uuid].name = charData.name
-                    self.battle.enemy[uuid].prefab = charData.prefab
-                    self.battle.enemy[uuid].hp = charData.hp
-                    self.battle.enemy[uuid].atk = charData.atk
-                    self.battle.enemy[uuid].spd = charData.spd
-                    self.battle.enemy[uuid].skill = charData.skill
-                    self.battle.enemy[uuid].move = charData.move
-                    self.battle.view:CreatePlayer(false , pos , self.battle.enemy[uuid])
+                    self.battle.hero[uuid].isOwn = false
+                    self.battle.hero[uuid].pos = pos + 4
+                    self.battle.hero[uuid].uid = id
+                    self.battle.hero[uuid].uuid = uuid
+                    self.battle.hero[uuid].name = charData.name
+                    self.battle.hero[uuid].prefab = charData.prefab
+                    self.battle.hero[uuid].hp = charData.hp
+                    self.battle.hero[uuid].atk = charData.atk
+                    self.battle.hero[uuid].spd = charData.spd
+                    self.battle.hero[uuid].skill = charData.skill
                     uuid = uuid + 1
                 end
             end
         end        
     end
+    self.battle.view:RefreshAllHero()
 end
 
 function BattleStartState:GetPlayerData(id)
-    local config = ConfigManager:GetConfig("Character")
+    local config = ConfigManager:GetConfig("Hero")
     if config ~= nil then
         return config[id]
     end

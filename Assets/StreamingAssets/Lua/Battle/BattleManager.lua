@@ -42,13 +42,8 @@ end
 
 
 ------------------------------------------------------------
-function BattleManager:GetCharData(id)
-    for uuid, data in pairs(self.own) do
-        if uuid == id then
-            return data
-        end
-    end
-    for uuid, data in pairs(self.enemy) do
+function BattleManager:GetHeroData(id)
+    for uuid, data in pairs(self.hero) do
         if uuid == id then
             return data
         end
@@ -60,61 +55,41 @@ function BattleManager:GetCharData(id)
     printError("找不到uuid"..id.."的英雄")
 end
 
-function BattleManager:GetCharSpd(id)
-    local charData = self:GetCharData(id)
-    return charData.spd
+function BattleManager:GetHeroSpd(id)
+    local heroData = self:GetHeroData(id)
+    return heroData.spd
 end
 
-function BattleManager:GetCharMaxHp(id)
-    local charData = ConfigManager:GetConfig("Character")
-    if charData ~= nil and charData[id] ~= nil then
-        return charData[id].hp
+function BattleManager:GetHeroMaxHp(id)
+    local heroData = ConfigManager:GetConfig("Hero")
+    if heroData ~= nil and heroData[id] ~= nil then
+        return heroData[id].hp
     end
 end
 
-function BattleManager:GetCharByPos(isOwn , pos)
-    if isOwn then
-        for uuid, data in pairs(self.own) do
-            if data.pos == pos then
-                return data
-            end
-        end
-    else
-        for uuid, data in pairs(self.enemy) do
-            if data.pos == pos then
-                return data
-            end
+function BattleManager:GetHeroByPos(pos)
+    for uuid, data in pairs(self.hero) do
+        if data.pos == pos then
+            return data
         end
     end
     
     return nil
 end
 
-function BattleManager:AddCharHp(isOwn ,pos , hp)
-    if isOwn then
-        for uuid, data in pairs(self.own) do
-            if data.pos == pos then
-                local maxHp = self:GetCharMaxHp(data.uid)
-                self.own[uuid].hp = math.max(0,math.min(self.own[uuid].hp + hp , maxHp))
-                if self.own[uuid].hp == 0 then
-                    self.own[uuid].isDead = true
-                end
-            end
-        end
-    else
-        for uuid, data in pairs(self.enemy) do
-            if data.pos == pos then
-                local maxHp = self:GetCharMaxHp(data.uid)
-                self.enemy[uuid].hp = math.max(0,math.min(self.enemy[uuid].hp + hp , maxHp))
-                if self.enemy[uuid].hp == 0 then
-                    self.enemy[uuid].isDead = true
-                end
+function BattleManager:AddHeroHp(pos , hp)
+    for uuid, data in pairs(self.hero) do
+        if data.pos == pos then
+            local maxHp = self:GetHeroMaxHp(data.uid)
+            self.hero[uuid].hp = math.max(0,math.min(self.hero[uuid].hp + hp , maxHp))
+            if self.hero[uuid].hp == 0 then
+                self.hero[uuid].isDead = true
             end
         end
     end
 end
 
-function BattleManager:UseSkillToChar(skillIndex,uuid)
+function BattleManager:UseSkillToHero(skillIndex,uuid)
     if self.state == BattleState.Round and self.ownTurn then
         self.fsmManager:GetNowState():OwnUseSkill(skillIndex,uuid)
         self.view:SetSkillSelect()
@@ -127,82 +102,65 @@ function BattleManager:OwnMove(moveTo)
     end
 end
 
-function BattleManager:ExchangeChar(isOwn , pos1 , pos2)
-    if isOwn then
-        local uuid1
-        local uuid2
-        for uuid, data in pairs(self.own) do
-            if data.pos == pos1 then
-                uuid1 = uuid
-            end
-            if data.pos == pos2 then
-                uuid2 = uuid
-            end
+function BattleManager:ExchangeHero(pos1 , pos2)
+    local uuid1
+    local uuid2
+    for uuid, data in pairs(self.hero) do
+        if data.pos == pos1 then
+            uuid1 = uuid
         end
-        
-        self.own[uuid1].pos = pos2
-        self.own[uuid2].pos = pos1
-    else
-        local uuid1
-        local uuid2
-        for uuid, data in pairs(self.enemy) do
-            if data.pos == pos1 then
-                uuid1 = uuid
-            end
-            if data.pos == pos2 then
-                uuid2 = uuid
-            end
+        if data.pos == pos2 then
+            uuid2 = uuid
         end
-        self.enemy[uuid1].pos = pos2
-        self.enemy[uuid2].pos = pos1
-    end    
+    end
+    self.hero[uuid1].pos = pos2
+    self.hero[uuid2].pos = pos1
 end
 
-function BattleManager:GetMoveAtkPos(isOwn , nowPos , skillConfig)
-    if skillConfig.typ == "cure" then
-        return skillConfig.atkPos
-    end
+-- function BattleManager:GetMoveAtkPos(isOwn , nowPos , skillConfig)
+--     if skillConfig.typ == "cure" then
+--         return skillConfig.atkPos
+--     end
 
-    if skillConfig.range == "own" then
-        return skillConfig.atkPos
-    end
+--     if skillConfig.range == "own" then
+--         return skillConfig.atkPos
+--     end
 
-    local atkPos = skillConfig.atkPos
-    local allData = self:GetOrderData()
+--     local atkPos = skillConfig.atkPos
+--     local allData = self:GetOrderData()
 
-    if nowPos ~= 8 then
-        for i = nowPos + 1, 8 do
-            local charData = allData[i]
-            if charData ~= nil and charData.isDead == nil then
-                break
-            end
-            if isOwn then
-                atkPos[2] = math.min(4,atkPos[2]+1)
-            end
-            if not isOwn then
-                atkPos[1] = math.max(1,atkPos[1]-1)
-            end
-        end        
-    end
-    if nowPos ~= 1 then
-        for i = nowPos - 1, 1,-1 do
-            local charData = allData[i]
-            if charData ~= nil and charData.isDead == nil then
-                break
-            end
-            if isOwn then
-                atkPos[1] = math.max(1,atkPos[1]-1)
-            end
-            if not isOwn then
-                atkPos[2] = math.min(4,atkPos[2]+1)
-            end
-        end        
-    end
-    return atkPos
-end
+--     if nowPos ~= 8 then
+--         for i = nowPos + 1, 8 do
+--             local charData = allData[i]
+--             if charData ~= nil and charData.isDead == nil then
+--                 break
+--             end
+--             if isOwn then
+--                 atkPos[2] = math.min(4,atkPos[2]+1)
+--             end
+--             if not isOwn then
+--                 atkPos[1] = math.max(1,atkPos[1]-1)
+--             end
+--         end        
+--     end
+--     if nowPos ~= 1 then
+--         for i = nowPos - 1, 1,-1 do
+--             local charData = allData[i]
+--             if charData ~= nil and charData.isDead == nil then
+--                 break
+--             end
+--             if isOwn then
+--                 atkPos[1] = math.max(1,atkPos[1]-1)
+--             end
+--             if not isOwn then
+--                 atkPos[2] = math.min(4,atkPos[2]+1)
+--             end
+--         end        
+--     end
+--     return atkPos
+-- end
 
-function BattleManager:GetCharTempMovePos(isOwn , pos)
-    local nowPos = self:GetOrderPos(isOwn , pos)
+function BattleManager:GetHeroTempMovePos(nowPos)
     local canMovePos = {}
     local allData = self:GetOrderData()
 
@@ -231,88 +189,121 @@ function BattleManager:GetCharTempMovePos(isOwn , pos)
     return canMovePos
 end
 
-function BattleManager:GetOrderPos(isOwn , nowPos)
-    local posIndex
-    if isOwn then
-        if nowPos == 1 then
-            posIndex = 4
-        elseif nowPos == 2 then
-            posIndex = 3
-        elseif nowPos == 3 then
-            posIndex = 2
-        elseif nowPos == 4 then
-            posIndex = 1
-        end
-    else
-        if nowPos == 1 then
-            posIndex = 5
-        elseif nowPos == 2 then
-            posIndex = 6
-        elseif nowPos == 3 then
-            posIndex = 7
-        elseif nowPos == 4 then
-            posIndex = 8
+-- function BattleManager:GetOrderPos(isOwn , nowPos)
+--     local posIndex
+--     if isOwn then
+--         if nowPos == 1 then
+--             posIndex = 4
+--         elseif nowPos == 2 then
+--             posIndex = 3
+--         elseif nowPos == 3 then
+--             posIndex = 2
+--         elseif nowPos == 4 then
+--             posIndex = 1
+--         end
+--     else
+--         if nowPos == 1 then
+--             posIndex = 5
+--         elseif nowPos == 2 then
+--             posIndex = 6
+--         elseif nowPos == 3 then
+--             posIndex = 7
+--         elseif nowPos == 4 then
+--             posIndex = 8
+--         end
+--     end
+
+--     return posIndex
+-- end
+
+-- function BattleManager:GetCampPos(orderPos)
+--     if orderPos == 1 then
+--         return true , 4
+--     elseif orderPos == 2 then
+--         return true , 3
+--     elseif orderPos == 3 then
+--         return true , 2
+--     elseif orderPos == 4 then
+--         return true , 1
+--     end
+
+--     if orderPos == 5 then
+--         return false , 1
+--     elseif orderPos == 6 then
+--         return false , 2
+--     elseif orderPos == 7 then
+--         return false , 3
+--     elseif orderPos == 8 then
+--         return false , 4
+--     end
+-- end
+
+function BattleManager:GetAllOwnPos()
+    local tmp = {}
+    for index, data in ipairs(self.hero) do
+        if data.isOwn and data.isDead == nil then
+            table.insert(tmp , data.pos)
         end
     end
-
-    return posIndex
+    return tmp
 end
 
-function BattleManager:GetCampPos(orderPos)
-    if orderPos == 1 then
-        return true , 4
-    elseif orderPos == 2 then
-        return true , 3
-    elseif orderPos == 3 then
-        return true , 2
-    elseif orderPos == 4 then
-        return true , 1
+function BattleManager:GetAllEnemyPos()
+    local tmp = {}
+    for index, data in ipairs(self.hero) do
+        if not data.isOwn and data.isDead == nil then
+            table.insert(tmp , data.pos)
+        end
     end
-
-    if orderPos == 5 then
-        return false , 1
-    elseif orderPos == 6 then
-        return false , 2
-    elseif orderPos == 7 then
-        return false , 3
-    elseif orderPos == 8 then
-        return false , 4
-    end
+    return tmp
 end
 
 function BattleManager:GetOrderData()
     local allData = {}
-    for uuid, data in pairs(self.own) do
-        local index = self:GetOrderPos(true , data.pos)
-        print(index)
-        printJson(data)
+    for uuid, data in pairs(self.hero) do
+        local index = data.pos
         allData[index] = data
     end
-    for uuid, data in pairs(self.enemy) do
-        local index = self:GetOrderPos(false , data.pos)
-        allData[index] = data
-    end
-
     return allData
 end
 
 function BattleManager:GetNowAtkPos(nowOrderPos , newOrderPos , skillConfig)
-    local atkPos = {}
+    local atkPos = {}   
+    if skillConfig.range == "all" then
+        if skillConfig.typ == "cure" then
+            atkPos = self:GetAllOwnPos()
+        end
+        if skillConfig.typ == "atk" then
+            atkPos = self:GetAllEnemyPos()
+        end
+        return atkPos
+    end
 
-    
+    if skillConfig.range == "own" then
+        table.insert(atkPos , nowOrderPos)
+        return atkPos
+    end
 
-    if newOrderPos ~= nil and newOrderPos ~= nowOrderPos and #skillConfig.atkPos~=4 and skillConfig.range ~= "own" then
+    local tmp = {}
+    if newOrderPos ~= nil and newOrderPos ~= nowOrderPos then
         local step = newOrderPos - nowOrderPos
         for index, pos in ipairs(skillConfig.atkPos) do                
             if skillConfig.typ == "cure" then
-                pos = math.max(1 , math.min(4 ,pos - step))
+                pos = pos - step
             else
-                pos = math.max(1 ,math.min(4 , pos + step))
+                pos = pos + step
             end
-            table.insert(atkPos , pos)
+            table.insert(tmp , pos)
         end
     else
-        atkPos = skillConfig.atkPos
+        tmp = skillConfig.atkPos
+    end
+
+    for index, pos in ipairs(tmp) do
+        local truePos = nowOrderPos + pos
+        if truePos >= 1 and truePos <= 8 then
+            table.insert(atkPos,truePos)
+        end        
     end
 
     return atkPos

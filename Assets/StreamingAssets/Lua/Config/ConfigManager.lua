@@ -6,7 +6,7 @@ ConfigManager = {}
 
 local files = {
     "TestBattle",
-    "Character",
+    "Hero",
     "Skill",
 }
 
