@@ -18,6 +18,7 @@ require "View.Base.ViewBase"
 require "View.Base.ViewManager"
 require "View.Base.ViewUtils"
 require "View.BattleUI"
+require "View.TopUI"
 
 require "Battle.BattleManager"
 require "Battle.State.BattleStartState"
@@ -26,6 +27,15 @@ require "Battle.State.RoundState"
 require "Battle.State.RoundEndState"
 require "Battle.State.BattleEndState"
 
+require "Hero.HeroControler"
+require "Hero.HeroState.HBattleStartState"
+require "Hero.HeroState.HRoundStartState"
+require "Hero.HeroState.HRoundEndState"
+require "Hero.HeroState.HBattleEndState"
+require "Hero.HeroState.HIdelState"
+require "Hero.HeroState.HAttackState"
+require "Hero.HeroState.HBeAttackedState"
+require "Hero.HeroState.HDeadState"
 
 local isPaused = false
 local isEditor = false

@@ -37,11 +37,14 @@ function ViewManager:Init(sceneIndex, sceneName)
     self.defaultBackground  = CommonUtil.GetGameObject(self.root, "BottomCanvas/DefaultBackground")
     self.inputMask          = CommonUtil.GetGameObject(self.root, "TopCanvas/InputMask")    -- 输入遮罩层，用于阻挡屏幕输入
     self.scrollHintLayout   = CommonUtil.GetTransform(self.root, "TopCanvas/SafeArea/ScrollHintLayout")    -- 滚动提示布局
+    
+    self.battleCamera = CommonUtil.GetGameObject(self.root, "UICamera")
 
     self.views = {}
     self.counter = Counter:Create()   -- UI模式计数器
     self.safeAreaSize = self.area.transform.sizeDelta
     self.safeAreaScale = self.area.transform.localScale
+    self.battleCameraDefaultPos = self.battleCamera.transform.position
 
     -- 加载中UI
     self.loadingUI = GameUtil.CreatePrefab("Prefab/UI/Common/Loading/LoadingUI")
@@ -535,6 +538,15 @@ function ViewManager:ShowScrollHint(message)
         CommonUtil.DOKill(child, nil)
         CommonUtil.DOAnchorPosY(child, nil, 80 * index, 0.25, nil)
     end
+end
+
+function ViewManager:MoveCamera(x , z)
+    CommonUtil.DOLocalMoveZ(self.battleCamera ,"", z  , 0.8)
+    CommonUtil.DOLocalMoveX(self.battleCamera ,"", x  , 0.8)
+end
+
+function ViewManager:ResetCamera()
+    CommonUtil.DOMove(self.battleCamera ,"",  self.battleCameraDefaultPos , 0.8)
 end
 
 

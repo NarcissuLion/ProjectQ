@@ -5,6 +5,7 @@
 Application 	= CS.UnityEngine.Application
 GameObject 		= CS.UnityEngine.GameObject
 Color           = CS.UnityEngine.Color
+Vector3         = CS.UnityEngine.Vector3
 
 CommonUtil 		= CS.CommonUtil
 GameUtil 		= CS.GameUtil

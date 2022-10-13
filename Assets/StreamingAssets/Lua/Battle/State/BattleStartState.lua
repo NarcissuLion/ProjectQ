@@ -14,9 +14,13 @@ end
 function BattleStartState:OnEnter()
     print("进入战斗")
     self:AddPlayer()
-    self.battle.view:SetOwnInfo()
-    self.battle.view:SetEnemyInfo()
+    self.battle.topView:SetOwnInfo()
+    self.battle.topView:SetEnemyInfo()
     self.battle:ChangeState(BattleState.RoundStart)
+
+    for key, hero in pairs(self.battle.hero) do
+        hero:ChangeState(HeroState.HBattleStartState)
+    end
 end
 
 function BattleStartState:CopyState()
@@ -41,48 +45,18 @@ function BattleStartState:AddPlayer()
         if index == 1 then
             for pos, id in ipairs(idArr) do
                 if id ~= "-1" then
-                    self.battle.hero[uuid] = {}
-                    local charData = self:GetPlayerData(id)
-                    self.battle.hero[uuid].isOwn = true
-                    self.battle.hero[uuid].pos = pos
-                    self.battle.hero[uuid].uid = id
-                    self.battle.hero[uuid].uuid = uuid
-                    self.battle.hero[uuid].name = charData.name
-                    self.battle.hero[uuid].prefab = charData.prefab
-                    self.battle.hero[uuid].hp = charData.hp
-                    self.battle.hero[uuid].atk = charData.atk
-                    self.battle.hero[uuid].spd = charData.spd
-                    self.battle.hero[uuid].skill = charData.skill
+                    self.battle.hero[uuid] = HeroControler.Create(uuid,pos,id,true)
                     uuid = uuid + 1
                 end
             end
         elseif index == 2 then
             for pos, id in ipairs(idArr) do
                 if id ~= "-1" then
-                    self.battle.hero[uuid] = {}
-                    local charData = self:GetPlayerData(id)
-                    self.battle.hero[uuid].isOwn = false
-                    self.battle.hero[uuid].pos = pos + 4
-                    self.battle.hero[uuid].uid = id
-                    self.battle.hero[uuid].uuid = uuid
-                    self.battle.hero[uuid].name = charData.name
-                    self.battle.hero[uuid].prefab = charData.prefab
-                    self.battle.hero[uuid].hp = charData.hp
-                    self.battle.hero[uuid].atk = charData.atk
-                    self.battle.hero[uuid].spd = charData.spd
-                    self.battle.hero[uuid].skill = charData.skill
+                    self.battle.hero[uuid] = HeroControler.Create(uuid,pos+5,id,false)
                     uuid = uuid + 1
                 end
             end
         end        
     end
     self.battle.view:RefreshAllHero()
-end
-
-function BattleStartState:GetPlayerData(id)
-    local config = ConfigManager:GetConfig("Hero")
-    if config ~= nil then
-        return config[id]
-    end
-    print(id .. " id is not found")
 end

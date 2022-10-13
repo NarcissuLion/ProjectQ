@@ -25,7 +25,6 @@ function FSMManager:AddState(stateClass)
 end
 
 function FSMManager:Start()
-    print(self.target.state)
     self.fsmManager[self.target.state]:OnEnter()
 end
 

@@ -14,8 +14,13 @@ end
 function RoundStartState:OnEnter()
     self.battle.roundIndex = self.battle.roundIndex == nil and 1 or self.battle.roundIndex + 1
     print("进入第"..self.battle.roundIndex.."回合")
-    self.battle.view:SetRound(self.battle.roundIndex)
+    self.battle.topView:SetRound(self.battle.roundIndex)
     self:InitSortBattleList()
+
+    for key, hero in pairs(self.battle.hero) do
+        hero:ChangeState(HeroState.HRoundStartState)
+    end
+
     self.battle:ChangeState(BattleState.Round)
 end
 

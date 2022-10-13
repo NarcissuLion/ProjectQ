@@ -1,5 +1,4 @@
 BattleManager = {}
-BattleManager.__index = BattleManager
 
 -- 战斗状态
 BattleState = {}
@@ -10,16 +9,13 @@ BattleState.RoundEnd = 4
 BattleState.BattleEnd = 5
 
 function BattleManager:Create(config)
-    local copy = {}
-    setmetatable(copy, BattleManager)
-
-    copy:Init(config)
-    return copy
+    self:Init(config)
 end
 
 function BattleManager:Init(config)
     self.config = config
-    self.view = BattleUI:Create(self)    
+    self.view = BattleUI:Create()
+    self.topView = TopUI:Create()
     self.state = BattleState.BattleStart
 
     self.ownTurn = false
@@ -67,10 +63,17 @@ function BattleManager:GetHeroMaxHp(id)
     end
 end
 
-function BattleManager:GetHeroByPos(pos)
+function BattleManager:GetHeroByPos(pos , useVol)
+    useVol = useVol == nil and true or useVol
     for uuid, data in pairs(self.hero) do
         if data.pos == pos then
             return data
+        end
+
+        if useVol and data.vol == 3 then
+            if data.pos + 1 == pos or data.pos - 1 == pos then
+                return data
+            end
         end
     end
     
@@ -92,7 +95,7 @@ end
 function BattleManager:UseSkillToHero(skillIndex,uuid)
     if self.state == BattleState.Round and self.ownTurn then
         self.fsmManager:GetNowState():OwnUseSkill(skillIndex,uuid)
-        self.view:SetSkillSelect()
+        self.topView:SetSkillSelect()
     end
 end
 
@@ -113,8 +116,12 @@ function BattleManager:ExchangeHero(pos1 , pos2)
             uuid2 = uuid
         end
     end
-    self.hero[uuid1].pos = pos2
-    self.hero[uuid2].pos = pos1
+    if uuid1 ~= nil then
+        self.hero[uuid1].pos = pos2
+    end
+    if uuid2 ~= nil then
+        self.hero[uuid2].pos = pos1
+    end
 end
 
 -- function BattleManager:GetMoveAtkPos(isOwn , nowPos , skillConfig)
@@ -129,8 +136,8 @@ end
 --     local atkPos = skillConfig.atkPos
 --     local allData = self:GetOrderData()
 
---     if nowPos ~= 8 then
---         for i = nowPos + 1, 8 do
+--     if nowPos ~= 10 then
+--         for i = nowPos + 1, 10 do
 --             local charData = allData[i]
 --             if charData ~= nil and charData.isDead == nil then
 --                 break
@@ -164,9 +171,9 @@ function BattleManager:GetHeroTempMovePos(nowPos)
     local canMovePos = {}
     local allData = self:GetOrderData()
 
-    if nowPos ~= 8 then
-        for i = nowPos + 1, 8 , 1 do
-            local charData = allData[i]
+    if nowPos ~= 10 then
+        for i = nowPos + 1, 10 , 1 do
+            local charData = self:GetHeroByPos(i)
             if charData ~= nil and charData.isDead == nil then
                 break
             end
@@ -175,7 +182,7 @@ function BattleManager:GetHeroTempMovePos(nowPos)
     end
     if nowPos ~= 1 then
         for i = nowPos - 1, 1,-1 do
-            local charData = allData[i]
+            local charData = self:GetHeroByPos(i)
             if charData ~= nil and charData.isDead == nil then
                 break
             end
@@ -301,11 +308,24 @@ function BattleManager:GetNowAtkPos(nowOrderPos , newOrderPos , skillConfig)
 
     for index, pos in ipairs(tmp) do
         local truePos = nowOrderPos + pos
-        if truePos >= 1 and truePos <= 8 then
+        if truePos >= 1 and truePos <= 10 then
             table.insert(atkPos,truePos)
         end        
     end
 
     return atkPos
+end
+
+function BattleManager:MoveCamera(pos1 , pos2)
+    --x -11 11
+    --z 16 26
+    local avg = (pos1 + pos2)/2
+    local dif = math.abs(pos1 - pos2)
+    local x = -13.4 + avg * 2.4
+    local z = 26 - dif * 1.1
+    ViewManager:MoveCamera( x , z)
+    AsyncCall(function ()
+        ViewManager:ResetCamera()
+    end,0.8)
 end
 

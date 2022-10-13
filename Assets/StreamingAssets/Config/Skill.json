@@ -1,65 +1,83 @@
 {
 "a1":{
 	"typ":"atk",
-	"name":"攻击1",
+	"name":"近身攻击",
 	"atkPos":[1,2],
+	"cd":0,
 	"dmg":[90,100],
 	"range":"one"
 },
 "a2":{
 	"typ":"atk",
-	"name":"攻击2",
+	"name":"远程攻击",
 	"atkPos":[3,4],
+	"cd":0,
 	"dmg":[90,100],
 	"range":"one"
 },
 "a3":{
 	"typ":"atk",
-	"name":"攻击3",
+	"name":"远程范围攻击",
 	"atkPos":[5,6],
+	"cd":0,
 	"dmg":[10,20],
 	"range":"aoe"
 },
 "a4":{
 	"typ":"atk",
-	"name":"攻击4",
+	"name":"全体伤害",
 	"atkPos":[0],
+	"cd":1,
 	"dmg":[40,60],
 	"range":"all"
 },
 "a5":{
 	"typ":"atk",
-	"name":"攻击5",
+	"name":"超远程范围攻击",
 	"atkPos":[7,8],
+	"cd":0,
 	"dmg":[70,80],
 	"range":"one"
 },
 "a6":{
 	"typ":"atk",
-	"name":"攻击6",
-	"atkPos":[1,2,3,4],
+	"name":"广域单体攻击",
+	"atkPos":[1,2,3,4,5,6],
+	"cd":0,
 	"dmg":[70,80],
 	"range":"one"
 },
 "c1":{
 	"typ":"cure",
-	"name":"治疗1",
+	"name":"单人治疗",
 	"atkPos":[1,2,3,4],
+	"cd":0,
 	"dmg":[20,30],
 	"range":"one"
 },
 "c2":{
 	"typ":"cure",
-	"name":"治疗2",
+	"name":"自我治疗",
 	"atkPos":[0],
+	"cd":0,
 	"dmg":[10,30],
 	"range":"own"
 },
 "c3":{
-	"typ":"cure",
+	"typ":"全体治疗",
 	"name":"治疗3",
 	"atkPos":[0],
+	"cd":1,
 	"dmg":[5,10],
 	"range":"all"
-}
+},
+"s1":{
+	"typ":"special",
+	"name":"召唤",
+	"atkPos":[1],
+	"cd":3,
+	"dmg":[0,0],
+	"heroId":[2],
+	"range":"own"
+	}
 }

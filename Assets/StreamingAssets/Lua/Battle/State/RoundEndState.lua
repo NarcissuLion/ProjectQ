@@ -13,6 +13,10 @@ end
 
 function RoundEndState:OnEnter()
     print(self.battle.roundIndex .. "回合结束")
+    for key, hero in pairs(self.battle.hero) do
+        hero:ChangeState(HeroState.HRoundEndState)
+    end
+
     self.battle:ChangeState(BattleState.RoundStart)
 end
 

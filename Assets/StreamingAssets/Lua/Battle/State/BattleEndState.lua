@@ -13,7 +13,9 @@ end
 
 function BattleEndState:OnEnter()
     print("退出战斗")
-    
+    for key, hero in pairs(self.battle.hero) do
+        hero:ChangeState(HeroState.HBattleEndState)
+    end
 end
 
 function BattleEndState:CopyState()

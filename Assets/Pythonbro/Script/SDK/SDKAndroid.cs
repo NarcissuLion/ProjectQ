@@ -13,7 +13,7 @@ public class SDKAndroid : SDKInterface {
 
     public override void Init()
     {
-        PlayGamesPlatform.Activate();
+        //PlayGamesPlatform.Activate();
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public class SDKAndroid : SDKInterface {
         }
         else
         {
-            PlayGamesPlatform.Instance.ShowLeaderboardUI(lbid);
+            //PlayGamesPlatform.Instance.ShowLeaderboardUI(lbid);
         }
     }
 

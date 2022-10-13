@@ -14,6 +14,11 @@ end
 function RoundState:OnEnter()
     print("第"..self.battle.roundIndex .. "回合中...")
     self.battle.view:SetHeroSelectOff()
+
+    for key, hero in pairs(self.battle.hero) do
+        hero:ChangeState(HeroState.HIdelState)
+    end
+
     self:DoNext()
 end
 
@@ -54,7 +59,7 @@ function RoundState:DoOwn(heroData)
     --显示信息
     self.battle.ownTurn = true
     self.battle.ownUuid = heroData.uuid
-    self.battle.view:SetOwnInfo(heroData)
+    self.battle.topView:SetOwnInfo(heroData)
     self.battle.view:SetHeroSelect(heroData.pos , "Select")
     self.battle.view:SetHeroTempMove(heroData.pos)
 end
@@ -71,6 +76,7 @@ function RoundState:DoEnemy(heroData)
         
         -- 等1s
         AsyncCall(function ()
+            local minPos = 8
             for index, p in ipairs(atkPos) do
                 local dmg = self:GetDmg(heroData , skillId)                
                 -- 显示伤害
@@ -81,9 +87,13 @@ function RoundState:DoEnemy(heroData)
                 end
                 -- 扣血，刷新界面ui
                 self.battle:AddHeroHp(p , dmg)
-                self.battle.view:RefreshHero(self.battle:GetHeroByPos(p))
-                self.battle.view:SetOwnInfo(self.battle:GetHeroData(self.battle.ownUuid))
+                self.battle.view:RefreshHero(p)
+                self.battle.topView:SetOwnInfo(self.battle:GetHeroData(self.battle.ownUuid))
+                if p<minPos then
+                    minPos = p
+                end
             end
+            BattleManager:MoveCamera(heroData.pos , minPos)
             AsyncCall(function ()
                 self:Pass()
             end , 1)
@@ -163,7 +173,9 @@ function RoundState:RandomAtkPos(skillId,selfPos)
     end
 
     if skillConfig.range == "own" then
-        return selfPos
+        local tmp = {}
+        table.insert(tmp , selfPos)
+        return tmp
     elseif skillConfig.range == "all" then
         if skillConfig.typ == "atk" then
             return self.battle:GetAllOwnPos()
@@ -174,7 +186,7 @@ function RoundState:RandomAtkPos(skillId,selfPos)
         local trueAtkPos = {}
         for index, pos in ipairs(skillConfig.atkPos) do
             local truePos = selfPos - pos
-            if truePos >= 1 and truePos <= 8 then
+            if truePos >= 1 and truePos <= 10 then
                 table.insert(trueAtkPos , truePos)
             end
         end
@@ -246,14 +258,14 @@ function RoundState:OwnUseSkill(skillIndex,targetUuid)
                     local dmg = self:GetDmg(heroData , skillId)                
                     self.battle.view:ShowDamage( p , dmg)
                     self.battle:AddHeroHp(p , dmg)
-                    self.battle.view:RefreshHero(self.battle:GetHeroByPos(p))
+                    self.battle.view:RefreshHero(p)
                 end
             elseif skillConfig.range == "one" then
                 local targetHeroData = self.battle:GetHeroData(targetUuid)            
                 local dmg = self:GetDmg(heroData , skillId)
                 self.battle.view:ShowDamage(targetHeroData.pos , dmg)
                 self.battle:AddHeroHp(targetHeroData.pos , dmg)
-                self.battle.view:RefreshHero(self.battle:GetHeroByPos(targetHeroData.pos))
+                self.battle.view:RefreshHero(targetHeroData.pos)
             end
 
         elseif skillConfig.typ == "cure" then
@@ -263,19 +275,19 @@ function RoundState:OwnUseSkill(skillIndex,targetUuid)
                     local dmg = self:GetDmg(heroData , skillId)                
                     self.battle.view:ShowCure(p , dmg)
                     self.battle:AddHeroHp(p , dmg)
-                    self.battle.view:RefreshHero(self.battle:GetHeroByPos(p))
+                    self.battle.view:RefreshHero(p)
                 end
             elseif skillConfig.range == "one" then
                 local targetHeroData = self.battle:GetHeroData(targetUuid)            
                 local dmg = self:GetDmg(heroData , skillId)
                 self.battle.view:ShowCure(targetHeroData.pos , dmg)
                 self.battle:AddHeroHp(targetHeroData.pos , dmg)
-                self.battle.view:RefreshHero(self.battle:GetHeroByPos(targetHeroData.pos))
+                self.battle.view:RefreshHero(targetHeroData.pos)
             elseif skillConfig.range == "own" then
                 local dmg = self:GetDmg(heroData , skillId)
                 self.battle.view:ShowCure(heroData.pos , dmg)
                 self.battle:AddHeroHp(heroData.pos , dmg)
-                self.battle.view:RefreshHero(self.battle:GetHeroByPos(heroData.pos))
+                self.battle.view:RefreshHero(heroData.pos)
             end
         end       
     end
@@ -284,15 +296,19 @@ function RoundState:OwnUseSkill(skillIndex,targetUuid)
     local id = self.battle.sortBattleList[1]
     local heroData = self.battle:GetHeroData(id) 
     local nowPos = heroData.pos
-    local newPos = self.battle.view.newPos
+    local newPos = self.battle.topView.newPos
     local skillId = heroData.skill[skillIndex]
     local skillConfig = ConfigManager:GetConfig("Skill")
     skillConfig = skillConfig[skillId]
+    if skillConfig.cd ~= 0 then
+        heroData.skillCD[skillIndex] = skillConfig.cd + 1
+    end
+    BattleManager:MoveCamera(nowPos , self.battle:GetHeroData(targetUuid).pos)
     if newPos == nil or nowPos == newPos or skillConfig.range == "own" or skillConfig.range == "all" then
         Atk(heroData , nowPos , newPos)
         self.battle.view:RefreshAllHero()
         AsyncCall(function ()
-            self.battle.view:SetOwnInfo(heroData)
+            self.battle.topView:SetOwnInfo(heroData)
             self:Pass()
         end , 1)
     else
@@ -306,7 +322,7 @@ function RoundState:OwnUseSkill(skillIndex,targetUuid)
             self.battle:ExchangeHero(heroData.pos , newPos)
             self.battle.view:RefreshAllHero()
             AsyncCall(function ()
-                self.battle.view:SetOwnInfo(heroData)
+                self.battle.topView:SetOwnInfo(heroData)
                 self:Pass()
             end , 1)
         end , 0.8)
@@ -322,9 +338,9 @@ function RoundState:OwnMove(moveTo)
     self.battle:ExchangeHero(heroData.pos , moveTo)
 
     AsyncCall(function ()
-        self.battle.view:RefreshHero(self.battle:GetHeroByPos(orgPos))
-        self.battle.view:RefreshHero(self.battle:GetHeroByPos(moveTo))
-        self.battle.view:SetOwnInfo(heroData)
+        self.battle.view:RefreshHero(orgPos)
+        self.battle.view:RefreshHero(moveTo)
+        self.battle.topView:SetOwnInfo(heroData)
         self:Pass()
     end , 0.8)
 end

@@ -6,153 +6,26 @@ BattleUI.instance = nil
 
 IMG_HERO_PATH = "Prefab/SpriteAssets/Character/"
 
-function BattleUI:Create(battleManager)
+function BattleUI:Create()
     local copy = ViewBase:Create({canClose = false})
     setmetatable(copy, self)
 
-    copy:Init(battleManager)
+    copy:Init()
 
     return copy
 end
 
-function BattleUI:Init(battleManager)
+function BattleUI:Init()
     self.root = self:Add("Prefab/UI/Battle/BattleUI")
-    self.battleManager = battleManager
     self.hero = {}
     self:CreatePlayer()
 end
 
 function BattleUI:CreatePlayer()
     local parent = CommonUtil.GetChild(self.root,"Hero")
-    for i = 1, 8 do
+    for i = 1, 10 do
         self.hero[i] = GameUtil.CreatePrefabToParent("Prefab/Character/Player",parent,i)
-    end    
-end
-
-function BattleUI:SetRound(index)
-    CommonUtil.SetText(self.root,"Top/RoundIndex","第"..index.."回合")
-end
-
-function BattleUI:SetOwnInfo(heroData,newPos)
-    local ownInfo = CommonUtil.GetChild(self.root,"UI/Own")
-    CommonUtil.SetActive(ownInfo ,nil, heroData ~= nil)
-    if heroData == nil then
-        return
-    end
-    CommonUtil.SetActive(ownInfo ,nil, heroData.isDead == nil)
-    if heroData.isDead ~= nil then
-        return
-    end
-
-    local configData = ConfigManager:GetConfig("Hero")
-    local maxHp = configData[heroData.uid].hp
-
-    ImageLoader.SetImage(ownInfo,"Icon" ,IMG_HERO_PATH..heroData.prefab)
-    CommonUtil.SetText(ownInfo,"Name" , heroData.name)
-    CommonUtil.SetText(ownInfo,"Hp" ,"HP:" .. heroData.hp .. "/" .. maxHp)
-    CommonUtil.SetText(ownInfo,"Speed" ,"SPD:" .. heroData.spd)
-    CommonUtil.SetText(ownInfo,"Atk" ,"ATK:" .. heroData.atk)
-    -- CommonUtil.SetActive(ownInfo, "Move",heroData.move > 0)
-    -- CommonUtil.AddButtonClick(ownInfo, "Move", BindFunction(self, self.OnClickMove, heroData))
-    for i = 1, 4 do
-        local skillId = heroData.skill[i]
-        CommonUtil.SetActive(ownInfo,"Skill/" .. i , skillId ~= nil)
-        if skillId ~= nil then
-            local skillConfig = ConfigManager:GetConfig("Skill")[skillId]
-            CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/name", skillConfig.name)
-            CommonUtil.AddButtonClick(ownInfo,"Skill/"..i , BindFunction(self,self.SetSkillSelect,i,skillConfig,heroData.pos,newPos))
-            --射程
-            if skillConfig.range == "own" then
-                CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/atkPos","射程:自己")
-            elseif skillConfig.range == "aoe" then
-                local text = ""
-                for index, pos in ipairs(skillConfig.atkPos) do
-                    if index == 1 then
-                        text = text .. pos
-                    else
-                        text = text .. "&" .. pos
-                    end
-                end
-                CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/atkPos","射程:[" .. text .. "]")
-            elseif skillConfig.range == "one" then
-                local text = ""
-                for index, pos in ipairs(skillConfig.atkPos) do
-                    if index == 1 then
-                        text = text .. pos
-                    else
-                        text = text .. "," .. pos
-                    end
-                end
-                CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/atkPos","射程:[" .. text .. "]")
-            elseif skillConfig.range == "all" then
-                CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/atkPos","射程:[all]")                
-            end
-
-            --伤害
-            if skillConfig.typ == "atk" then
-                CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/dmg","伤害:"..skillConfig.dmg[1].."% - "..skillConfig.dmg[2] .. "%")
-            elseif skillConfig.typ == "cure" then
-                CommonUtil.SetText(ownInfo,"Skill/" .. i .. "/dmg","治疗:"..skillConfig.dmg[1].." - "..skillConfig.dmg[2])
-            end
-
-            --判断技能哪些可以用
-            local canUse = false
-            if self.battleManager.ownTurn then
-                --检查被攻击的位置是否有人
-                if skillConfig.range == "own" then
-                    canUse = true
-                end
-                if skillConfig.range == "all" then
-                    canUse = true
-                end
-                local atkPos = self.battleManager:GetNowAtkPos(heroData.pos,newPos , skillConfig)
-                printJson(atkPos)
-                for index, pos in ipairs(atkPos) do
-                    local heroData = self.battleManager:GetHeroByPos(pos)
-                    if heroData ~= nil and heroData.isDead == nil then
-                        if skillConfig.typ == "cure" then
-                            if heroData.isOwn then
-                                canUse = true
-                                break                                
-                            end
-                        else
-                            if not heroData.isOwn then
-                                canUse = true
-                                break                                
-                            end
-                        end                        
-                    end
-                end
-            end
-            self:SetOwnSkillEnable(i , canUse)
-        end
-    end
-
-end
-
-function BattleUI:SetEnemyInfo(uuid)
-    local enemyInfo = CommonUtil.GetChild(self.root,"UI/Enemy")
-    CommonUtil.SetActive(enemyInfo ,nil, uuid ~= nil)
-    if uuid == nil then
-        return
-    end
-    local heroData = self.battleManager:GetHeroData(uuid)
-    local configData = ConfigManager:GetConfig("Hero")
-    local maxHp = configData[heroData.uid].hp
-
-    ImageLoader.SetImage(enemyInfo,"Icon" ,IMG_HERO_PATH..heroData.prefab)
-    CommonUtil.SetText(enemyInfo,"Name" , heroData.name)
-    CommonUtil.SetText(enemyInfo,"Hp" ,"HP:" .. heroData.hp .. "/" .. maxHp)
-    CommonUtil.SetText(enemyInfo,"Hp" ,"SPD:" .. heroData.spd)
-    CommonUtil.SetText(enemyInfo,"Hp" ,"ATK:" .. heroData.atk)
-
-    for i = 1, 4 do
-        local skillId = heroData.skill[i]
-        CommonUtil.SetActive(enemyInfo,"Skill/" .. i , skillId ~= nil)
-        if skillId ~= nil then
-            local skillConfig = ConfigManager:GetConfig("Skill")
-            CommonUtil.SetText(enemyInfo,"Skill/" .. i .. "/name", skillConfig[skillId].name)
-        end
+        CommonUtil.SetActive(self.hero[i] , nil , false)
     end
 end
 
@@ -176,10 +49,15 @@ function BattleUI:SetHeroSelectedOff()
     end
 end
 
-function BattleUI:RefreshHero(heroData)
+function BattleUI:RefreshHero(pos)
+    local heroData = BattleManager:GetHeroByPos(pos , false)
+    local player = self.hero[pos]
+    if heroData == nil then
+        CommonUtil.SetActive(player , nil , false)
+        return
+    end
     local configData = ConfigManager:GetConfig("Hero")
     local maxHp = configData[heroData.uid].hp
-    local player = self.hero[heroData.pos]
     if heroData.isDead then
         CommonUtil.SetActive(player , nil , false)
         return
@@ -201,14 +79,14 @@ function BattleUI:RefreshHero(heroData)
         CommonUtil.AddButtonClick(player, "SelectedCure", BindFunction(self, self.OnClickUseSkillToHero, heroData.uuid))
         CommonUtil.AddButtonClick(player, "SelectedMove", BindFunction(self, self.OnSelectMove, heroData.pos))
     else
-        CommonUtil.AddButtonClick(player, "Btn", BindFunction(self, self.SetEnemyInfo, heroData.uuid))
+        CommonUtil.AddButtonClick(player, "Btn", BindFunction(self, BattleManager.topView.SetEnemyInfo, heroData.uuid))
         CommonUtil.AddButtonClick(player, "Selected", BindFunction(self, self.OnClickUseSkillToHero, heroData.uuid))
     end
 end
 
 function BattleUI:RefreshAllHero()
-    for uuid, data in pairs(self.battleManager.hero) do
-        self:RefreshHero(data)
+    for i = 1, 10 do
+        self:RefreshHero(i)
     end
 end
 
@@ -240,62 +118,17 @@ function BattleUI:ShowCure(pos , cure)
     end , 1.8)
 end
 
-function BattleUI:SetOwnSkillEnable(index , canUse)
-    CommonUtil.SetBtnInteractable(self.root,"UI/Own/Skill/" .. index , canUse)
-end
-
-function BattleUI:SetOwnSkillAllDisenable()
-    for i = 1, 4 do
-        CommonUtil.SetBtnInteractable(self.root,"UI/Own/Skill/" .. i , false)
-    end
-end
-
-function BattleUI:SetSkillSelect(index , skillConfig , nowPos , newPos)    
-    for i = 1, 4 do
-        CommonUtil.SetActive(self.root,"UI/Own/Skill/" .. i .. "/Select",false)
-    end
-    if index == nil then
-        return
-    end
-
-    self.selectSkillIndex = index
-    CommonUtil.SetActive(self.root,"UI/Own/Skill/" .. index .. "/Select",true)
-
-    self:SetHeroSelectedOff()
-    self.newPos = newPos
-
-    local atkPos = self.battleManager:GetNowAtkPos(nowPos , newPos , skillConfig)
-    if skillConfig.typ == "cure" then
-        for key, pos in ipairs(atkPos) do
-            if pos == 0 then
-                self:SetHeroSelect(nowPos , "SelectedCure")
-            else
-                local heroData = self.battleManager:GetHeroByPos(pos)
-                if not heroData.isDead and heroData.isOwn then
-                    self:SetHeroSelect(pos , "SelectedCure")
-                end
-            end            
-        end
-    elseif skillConfig.typ == "atk" then
-        for key, pos in ipairs(atkPos) do
-            local heroData = self.battleManager:GetHeroByPos(pos)
-            if not heroData.isDead and not heroData.isOwn then
-                self:SetHeroSelect(pos , "Selected")
-            end
-        end
-    end
-end
 
 function BattleUI:SetHeroTempMove(nowPos , newPos)
     if newPos == nil then
         newPos = nowPos
     end
-    local canMovePos = self.battleManager:GetHeroTempMovePos(nowPos)
+    local canMovePos = BattleManager:GetHeroTempMovePos(nowPos)
     if #canMovePos == 0 then
         return
     end
     self:SetHeroSelectedOff()
-    local heroData = self.battleManager:GetHeroByPos(nowPos)
+    local heroData = BattleManager:GetHeroByPos(nowPos)
     local configData = ConfigManager:GetConfig("Hero")
     local maxHp = configData[heroData.uid].hp
     for index, pos in ipairs(canMovePos) do
@@ -330,16 +163,16 @@ function BattleUI:SetHeroTempMove(nowPos , newPos)
             CommonUtil.SetImageFillAmount(player, "HpBar/Image" , heroData.hp/maxHp)
         end        
     end
-    self:SetOwnInfo(heroData , newPos)
-    self:SetSkillSelect()
+    BattleManager.topView:SetOwnInfo(heroData , newPos)
+    BattleManager.topView:SetSkillSelect()
 end
 
 function BattleUI:OnClickUseSkillToHero(uuid)
-    self.battleManager:UseSkillToHero(self.selectSkillIndex , uuid)
+    BattleManager:UseSkillToHero(BattleManager.topView.selectSkillIndex , uuid)
 end
 
 function BattleUI:OnClickMove(heroData)
-    self:SetSkillSelect()
+    BattleManager.topView:SetSkillSelect()
     if heroData.move == 0 then
         return
     end
@@ -368,7 +201,7 @@ function BattleUI:ShowMoveSelect(heroData)
 end
 
 function BattleUI:OnSelectMove(moveTo)
-    self.battleManager:OwnMove(moveTo)
+    BattleManager:OwnMove(moveTo)
 end
 
 function BattleUI:ExchangeHero(pos1 , pos2)
