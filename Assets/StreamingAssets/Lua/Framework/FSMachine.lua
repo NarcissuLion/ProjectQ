@@ -68,7 +68,7 @@ end
 function FSMachine.State:OnEnter(...)
 end
 
-function FSMachine.State:Update(...)
+function FSMachine.State:OnUpdate(...)
 end
 
 function FSMachine.State:OnExit(...)
@@ -99,7 +99,7 @@ return FSMachine
 -- -- function MyState:OnEnter(...)
 -- -- end
 
--- -- function MyState:Update(...)
+-- -- function MyState:OnUpdate(...)
 -- -- end
 
 -- -- function MyState:OnExit(...)
