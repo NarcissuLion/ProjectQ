@@ -1,4 +1,4 @@
-Notifier = {}
+local Notifier = {}
 
 local listeners = {}
 local lookupTbl = {}
