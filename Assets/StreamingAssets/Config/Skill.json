@@ -64,8 +64,8 @@
 	"range":"own"
 },
 "c3":{
-	"typ":"全体治疗",
-	"name":"治疗3",
+	"typ":"cure",
+	"name":"全体治疗",
 	"atkPos":[0],
 	"cd":1,
 	"dmg":[5,10],
@@ -73,11 +73,10 @@
 },
 "s1":{
 	"typ":"special",
-	"name":"召唤",
-	"atkPos":[1],
+	"name":"献祭攻击",
+	"atkPos":[0],
 	"cd":3,
-	"dmg":[0,0],
-	"heroId":[2],
-	"range":"own"
+	"dmg":[100,120],
+	"range":"all"
 	}
 }

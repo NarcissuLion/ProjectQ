@@ -1,15 +1,15 @@
+local FSMachine = require "Framework.FSMachine"
+local Notifier = require "Framework.Notifier"
+
 HeroControler = {}
 HeroControler.__index = HeroControler
 
 HeroState = {}
-HeroState.HBattleStartState = 1
-HeroState.HRoundStartState = 2
-HeroState.HIdelState = 3
-HeroState.HAttackState = 4
-HeroState.HBeAttackedState = 5
-HeroState.HRoundEndState = 6
-HeroState.HBattleEndState = 7
-HeroState.HDeadState = 8
+HeroState.IdelState = "IdelState"
+HeroState.ActionState = "ActionState"
+HeroState.HurtState = "HurtState"
+HeroState.DyingState = "DyingState"
+HeroState.DeadState = "DeadState"
 
 function HeroControler.Create(uuid,pos,id,isOwn)
     local copy = {}
@@ -20,45 +20,109 @@ function HeroControler.Create(uuid,pos,id,isOwn)
 end
 
 function HeroControler:Init(uuid,pos,id,isOwn)
-    local charData = self:GetPlayerData(id)
+    local heroData = ConfigManager:GetConfig("Hero")[id]
 
     self.isOwn = isOwn
     self.pos = pos
     self.uid = id
     self.uuid = uuid
-    self.name = charData.name
-    self.prefab = charData.prefab
-    self.hp = charData.hp
-    self.atk = charData.atk
-    self.spd = charData.spd
-    self.vol = charData.vol
-    self.skill = charData.skill
+    self.name = heroData.name
+    self.prefab = heroData.prefab
+    self.hp = heroData.hp
+    self.atk = heroData.atk
+    self.spd = heroData.spd
+    self.vol = heroData.vol
+    self.isDead = false
+    self.skill = heroData.skill
     self.skillCD = {0,0,0,0}
 
-    self.state = HeroState.HBattleStartState
+    self.isPlayAction = false
+
+    self.state = HeroState.IdelState
     self:InitState()
-    self.fsmManager:Start()
+    self:ChangeState(self.state)
 end
 
 function HeroControler:InitState()
-    self.fsmManager = FSMManager.Create(self)
-    self.fsmManager:AddState(HBattleStartState:Create(self))
-    self.fsmManager:AddState(HRoundStartState:Create(self))
-    self.fsmManager:AddState(HIdelState:Create(self))
-    self.fsmManager:AddState(HAttackState:Create(self))
-    self.fsmManager:AddState(HBeAttackedState:Create(self))
-    self.fsmManager:AddState(HRoundEndState:Create(self))
-    self.fsmManager:AddState(HBattleEndState:Create(self))
+    self.fsmManager = FSMachine.Create(self)
+    self.fsmManager:Add(HeroState.IdelState , IdelState:Create(self))
+    self.fsmManager:Add(HeroState.ActionState , ActionState:Create(self))
+    self.fsmManager:Add(HeroState.HurtState , HurtState:Create(self))
+    self.fsmManager:Add(HeroState.DyingState , DyingState:Create(self))
+    self.fsmManager:Add(HeroState.DeadState , DeadState:Create(self))
 end
 
-function HeroControler:ChangeState(newState)
-    self.fsmManager:ChangeState(newState)
+function HeroControler:ChangeState(newState , ...)
+    self.fsmManager:Switch(newState , ...)
 end
 
-function HeroControler:GetPlayerData(id)
+function HeroControler:OnBattleStart()
+    
+end
+
+function HeroControler:OnBattleEnd()
+    
+end
+
+function HeroControler:OnRoundStart()
+    
+end
+
+function HeroControler:OnRoundEnd()
+    for index, cd in ipairs(self.skillCD) do
+        if cd > 0 then
+            self.skillCD[index] = self.skillCD[index] - 1
+        end
+    end
+
+    if self.uid == "1" then
+        for i = 8, 10 do
+            local hero = BattleManager:GetHeroByPos(i)
+            if hero == nil or hero.isDead then
+                Notifier.Dispatch("ShowEffectText" , self.pos , "召唤")
+                BattleManager:CreatePlayer(i , "2" , false)
+                break
+            end
+        end
+    end
+end
+
+function HeroControler:OnActionStart()
+    
+end
+
+function HeroControler:OnActionEnd()
+    
+end
+
+
+---------------------Tool-------------------------
+function HeroControler:GetHeroData(id)
     local config = ConfigManager:GetConfig("Hero")
     if config ~= nil then
         return config[id]
     end
     print(id .. " id is not found")
+end
+
+function HeroControler:AddHeroHp(hp)
+    local maxHp = BattleManager:GetHeroMaxHp(self.uid)
+    self.hp = math.max(0,math.min(self.hp + hp , maxHp))
+    if self.hp == 0 then
+        self:ChangeState(HeroState.DyingState)
+    end
+end
+
+function HeroControler:GetDmg(skillId)
+    local skillConfig = ConfigManager:GetConfig("Skill") 
+    local skillConfig = skillConfig[skillId]
+    if skillConfig == nil then
+        printError("技能" .. skillId .. "表中缺失")
+        return
+    end
+    if skillConfig.typ == "atk" or skillConfig.typ == "special" then
+        return -math.ceil(math.random(skillConfig.dmg[1] ,skillConfig.dmg[2] ) * 0.01 * self.atk)
+    elseif skillConfig.typ == "cure" then
+        return math.random(skillConfig.dmg[1] ,skillConfig.dmg[2] )
+    end
 end

@@ -28,11 +28,11 @@ function FSMManager:Start()
     self.fsmManager[self.target.state]:OnEnter()
 end
 
-function FSMManager:ChangeState(stateId)
+function FSMManager:ChangeState(stateId , ...)
     self.fsmManager[self.target.state]:OnLeave()
     self.fsmManager[stateId]:CopyState(self.target.state)
     self.target.state = stateId
-    self.fsmManager[stateId]:OnEnter()
+    self.fsmManager[stateId]:OnEnter(...)
 end
 
 function FSMManager:Update()

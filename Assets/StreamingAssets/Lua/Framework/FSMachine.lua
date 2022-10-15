@@ -39,7 +39,8 @@ function FSMachine:Switch(stateName, ...)
         self.currState:OnExit(stateName)
     end
     self.currState = nextState
-    self.currState:OnEnter(...)
+    local param = {...}
+    self.currState:OnEnter(param[1] , param[2] , param[3] , param[4] , param[5])
 end
 
 function FSMachine:Update(...)

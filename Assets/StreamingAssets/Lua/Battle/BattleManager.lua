@@ -1,12 +1,19 @@
+local FSMachine = require "Framework.FSMachine"
+local Notifier = require 'Framework.Notifier'
 BattleManager = {}
 
 -- 战斗状态
 BattleState = {}
-BattleState.BattleStart = 1
-BattleState.RoundStart = 2
-BattleState.Round = 3
-BattleState.RoundEnd = 4
-BattleState.BattleEnd = 5
+BattleState.BattleStart = "BattleStart"
+BattleState.RoundStart  = "RoundStart"
+BattleState.Round       = "Round"
+BattleState.ActorStart  = "ActorStart"
+BattleState.ActorInput  = "ActorInput"
+BattleState.ActorAI     = "ActorAI"
+BattleState.ActorAction = "ActorAction"
+BattleState.ActorEnd    = "ActorEnd"
+BattleState.RoundEnd    = "RoundEnd"
+BattleState.BattleEnd   = "BattleEnd"
 
 function BattleManager:Create(config)
     self:Init(config)
@@ -16,28 +23,46 @@ function BattleManager:Init(config)
     self.config = config
     self.view = BattleUI:Create()
     self.topView = TopUI:Create()
+    self.hero = {}
     self.state = BattleState.BattleStart
-
-    self.ownTurn = false
+    self.uuid = 0
+    
     self:InitState()
-    self.fsmManager:Start()
+    self:ChangeState(self.state)
 end
 
 function BattleManager:InitState()
-    self.fsmManager = FSMManager.Create(self)
-    self.fsmManager:AddState(BattleStartState:Create(self))
-    self.fsmManager:AddState(RoundStartState:Create(self))
-    self.fsmManager:AddState(RoundState:Create(self))
-    self.fsmManager:AddState(RoundEndState:Create(self))
-    self.fsmManager:AddState(BattleEndState:Create(self))
+    self.fsmManager = FSMachine.Create(self)
+    self.fsmManager:Add(BattleState.BattleStart , BattleStartState:Create(self))
+    self.fsmManager:Add(BattleState.RoundStart  , RoundStartState:Create(self))
+    self.fsmManager:Add(BattleState.Round       , RoundState:Create(self))
+    self.fsmManager:Add(BattleState.ActorStart  , ActorStartState:Create(self))
+    self.fsmManager:Add(BattleState.ActorInput  , ActorInputState:Create(self))
+    self.fsmManager:Add(BattleState.ActorAI     , ActorAIState:Create(self))
+    self.fsmManager:Add(BattleState.ActorAction , ActorActionState:Create(self))
+    self.fsmManager:Add(BattleState.ActorEnd    , ActorEndState:Create(self))
+    self.fsmManager:Add(BattleState.RoundEnd    , RoundEndState:Create(self))
+    self.fsmManager:Add(BattleState.BattleEnd   , BattleEndState:Create(self))
 end
 
-function BattleManager:ChangeState(newState)
-    self.fsmManager:ChangeState(newState)
+function BattleManager:ChangeState(newState , ...)
+    self.fsmManager:Switch(newState , ...)
 end
 
 
 ------------------------------------------------------------
+
+function BattleManager:CreatePlayer(pos,id,isOwn)
+    self.uuid = self.uuid + 1
+    local posHero = self:GetHeroByPos(pos)
+    if posHero ~= nil then
+        posHero:Init(self.uuid,pos,id,isOwn)
+    else
+        self.hero[self.uuid] = HeroControler.Create(self.uuid,pos,id,isOwn)
+    end
+
+    Notifier.Dispatch("RefreshHero" , pos)
+end
 function BattleManager:GetHeroData(id)
     for uuid, data in pairs(self.hero) do
         if uuid == id then
@@ -51,10 +76,10 @@ function BattleManager:GetHeroData(id)
     printError("找不到uuid"..id.."的英雄")
 end
 
-function BattleManager:GetHeroSpd(id)
-    local heroData = self:GetHeroData(id)
-    return heroData.spd
-end
+-- function BattleManager:GetHeroSpd(id)
+--     local heroData = self:GetHeroData(id)
+--     return heroData.spd
+-- end
 
 function BattleManager:GetHeroMaxHp(id)
     local heroData = ConfigManager:GetConfig("Hero")
@@ -70,8 +95,8 @@ function BattleManager:GetHeroByPos(pos , useVol)
             return data
         end
 
-        if useVol and data.vol == 3 then
-            if data.pos + 1 == pos or data.pos - 1 == pos then
+        if useVol and data.vol == 2 then
+            if data.pos - 1 == pos then
                 return data
             end
         end
@@ -80,30 +105,30 @@ function BattleManager:GetHeroByPos(pos , useVol)
     return nil
 end
 
-function BattleManager:AddHeroHp(pos , hp)
-    for uuid, data in pairs(self.hero) do
-        if data.pos == pos then
-            local maxHp = self:GetHeroMaxHp(data.uid)
-            self.hero[uuid].hp = math.max(0,math.min(self.hero[uuid].hp + hp , maxHp))
-            if self.hero[uuid].hp == 0 then
-                self.hero[uuid].isDead = true
-            end
-        end
-    end
-end
+-- function BattleManager:AddHeroHp(pos , hp)
+--     for uuid, data in pairs(self.hero) do
+--         if data.pos == pos then
+--             local maxHp = self:GetHeroMaxHp(data.uid)
+--             self.hero[uuid].hp = math.max(0,math.min(self.hero[uuid].hp + hp , maxHp))
+--             if self.hero[uuid].hp == 0 then
+--                 self.hero[uuid].isDead = true
+--             end
+--         end
+--     end
+-- end
 
-function BattleManager:UseSkillToHero(skillIndex,uuid)
-    if self.state == BattleState.Round and self.ownTurn then
-        self.fsmManager:GetNowState():OwnUseSkill(skillIndex,uuid)
-        self.topView:SetSkillSelect()
-    end
-end
+-- function BattleManager:UseSkillToHero(skillIndex,uuid)
+--     if self.state == BattleState.Round and self.ownTurn then
+--         self.fsmManager:GetNowState():OwnUseSkill(skillIndex,uuid)
+--         self.topView:SetSkillSelect()
+--     end
+-- end
 
-function BattleManager:OwnMove(moveTo)
-    if self.state == BattleState.Round and self.ownTurn then
-        self.fsmManager:GetNowState():OwnMove(moveTo)
-    end
-end
+-- function BattleManager:OwnMove(moveTo)
+--     if self.state == BattleState.Round and self.ownTurn then
+--         self.fsmManager:GetNowState():OwnMove(moveTo)
+--     end
+-- end
 
 function BattleManager:ExchangeHero(pos1 , pos2)
     local uuid1
@@ -138,8 +163,8 @@ end
 
 --     if nowPos ~= 10 then
 --         for i = nowPos + 1, 10 do
---             local charData = allData[i]
---             if charData ~= nil and charData.isDead == nil then
+--             local heroData = allData[i]
+--             if heroData ~= nil and heroData.isDead == nil then
 --                 break
 --             end
 --             if isOwn then
@@ -152,8 +177,8 @@ end
 --     end
 --     if nowPos ~= 1 then
 --         for i = nowPos - 1, 1,-1 do
---             local charData = allData[i]
---             if charData ~= nil and charData.isDead == nil then
+--             local heroData = allData[i]
+--             if heroData ~= nil and heroData.isDead == nil then
 --                 break
 --             end
 --             if isOwn then
@@ -169,12 +194,11 @@ end
 
 function BattleManager:GetHeroTempMovePos(nowPos)
     local canMovePos = {}
-    local allData = self:GetOrderData()
 
     if nowPos ~= 10 then
         for i = nowPos + 1, 10 , 1 do
-            local charData = self:GetHeroByPos(i)
-            if charData ~= nil and charData.isDead == nil then
+            local heroData = self:GetHeroByPos(i)
+            if heroData ~= nil and not heroData.isDead then
                 break
             end
             table.insert(canMovePos , i)
@@ -182,8 +206,8 @@ function BattleManager:GetHeroTempMovePos(nowPos)
     end
     if nowPos ~= 1 then
         for i = nowPos - 1, 1,-1 do
-            local charData = self:GetHeroByPos(i)
-            if charData ~= nil and charData.isDead == nil then
+            local heroData = self:GetHeroByPos(i)
+            if heroData ~= nil and not heroData.isDead then
                 break
             end
             table.insert(canMovePos , i)
@@ -248,7 +272,7 @@ end
 function BattleManager:GetAllOwnPos()
     local tmp = {}
     for index, data in ipairs(self.hero) do
-        if data.isOwn and data.isDead == nil then
+        if data.isOwn and not data.isDead then
             table.insert(tmp , data.pos)
         end
     end
@@ -258,7 +282,7 @@ end
 function BattleManager:GetAllEnemyPos()
     local tmp = {}
     for index, data in ipairs(self.hero) do
-        if not data.isOwn and data.isDead == nil then
+        if not data.isOwn and not data.isDead then
             table.insert(tmp , data.pos)
         end
     end
@@ -329,3 +353,26 @@ function BattleManager:MoveCamera(pos1 , pos2)
     end,0.8)
 end
 
+function BattleManager:OrderHero()
+    if self.hero == nil then
+        return
+    end
+
+    local orderHero = {}
+    for key, hero in pairs(self.hero) do
+        if not hero.isDead  then
+            table.insert(orderHero , hero)
+        end
+    end
+
+    table.sort(orderHero , function (a,b)
+        return a.spd > b.spd
+    end)
+
+    return orderHero
+end
+
+function BattleManager:HpIsFull(heroData)
+    local maxHp = self:GetHeroMaxHp(heroData.uid)
+    return heroData.hp >= maxHp
+end

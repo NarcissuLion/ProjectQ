@@ -24,18 +24,25 @@ require "Battle.BattleManager"
 require "Battle.State.BattleStartState"
 require "Battle.State.RoundStartState"
 require "Battle.State.RoundState"
+require "Battle.State.ActorStartState"
+require "Battle.State.ActorInputState"
+require "Battle.State.ActorAIState"
+require "Battle.State.ActorActionState"
+require "Battle.State.ActorEndState"
 require "Battle.State.RoundEndState"
 require "Battle.State.BattleEndState"
 
+
 require "Hero.HeroControler"
-require "Hero.HeroState.HBattleStartState"
-require "Hero.HeroState.HRoundStartState"
-require "Hero.HeroState.HRoundEndState"
-require "Hero.HeroState.HBattleEndState"
-require "Hero.HeroState.HIdelState"
-require "Hero.HeroState.HAttackState"
-require "Hero.HeroState.HBeAttackedState"
-require "Hero.HeroState.HDeadState"
+require "Hero.HeroState.IdelState"
+require "Hero.HeroState.ActionState"
+require "Hero.HeroState.HurtState"
+require "Hero.HeroState.DyingState"
+require "Hero.HeroState.DeadState"
+
+require "Framework.Notifier"
+require "Framework.FSMachine"
+
 
 local isPaused = false
 local isEditor = false

@@ -1,33 +1,51 @@
+local FSMachine = require 'Framework.FSMachine'
 RoundEndState = {}
 RoundEndState.__index = RoundEndState
-setmetatable(RoundEndState, FSMState)
+setmetatable(RoundEndState, FSMachine.State)
 
 function RoundEndState:Create(battle)
-    local copy = FSMState:Create()
-    setmetatable(copy, self)
+    local copy = {}
+    setmetatable(copy, RoundEndState)
     copy.battle = battle
     copy.id = BattleState.RoundEnd
-
+    copy:Init()
     return copy
 end
 
-function RoundEndState:OnEnter()
-    print(self.battle.roundIndex .. "回合结束")
-    for key, hero in pairs(self.battle.hero) do
-        hero:ChangeState(HeroState.HRoundEndState)
-    end
+function RoundEndState:Init()
+end
 
+function RoundEndState:OnEnter()
+    self.orderHero = self.battle:OrderHero()    
+    print(self.battle.roundIndex .. "回合结束")
+    -- todoUpdate
+    for index, hero in ipairs(self.orderHero) do
+        hero:OnRoundEnd()
+    end
     self.battle:ChangeState(BattleState.RoundStart)
 end
 
-function RoundEndState:CopyState()
+function RoundEndState:Dispose()
 
 end
 
-function RoundEndState:Update()
+function RoundEndState:OnUpdate()
+    self:PlayBuff()
+end
+
+function RoundEndState:OnExit()
 
 end
 
-function RoundEndState:OnLeave()
-
+function RoundEndState:PlayBuff()
+    if #self.orderHero == 0 then
+        self.battle:ChangeState(BattleState.RoundStart)
+        return
+    end
+    self.orderHero[1]:OnRoundEnd()
+    if self.orderHero[1].isPlayAction then
+        return
+    else
+        table.remove(self.orderHero , 1)
+    end
 end

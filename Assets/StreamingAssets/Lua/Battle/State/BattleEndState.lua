@@ -1,31 +1,37 @@
+local FSMachine = require 'Framework.FSMachine'
 BattleEndState = {}
 BattleEndState.__index = BattleEndState
-setmetatable(BattleEndState, FSMState)
+setmetatable(BattleEndState, FSMachine.State)
 
 function BattleEndState:Create(battle)
-    local copy = FSMState:Create()
-    setmetatable(copy, self)
+    local copy = {}
+    setmetatable(copy, BattleEndState)
     copy.battle = battle
     copy.id = BattleState.BattleEnd
-
+    copy:Init()
     return copy
+end
+
+function BattleEndState:Init()
+    
 end
 
 function BattleEndState:OnEnter()
     print("退出战斗")
-    for key, hero in pairs(self.battle.hero) do
-        hero:ChangeState(HeroState.HBattleEndState)
+    self.orderHero = self.battle:OrderHero()    
+    for key, hero in pairs(self.orderHero) do
+        hero:OnBattleEnd()
     end
 end
 
-function BattleEndState:CopyState()
+function BattleEndState:Dispose()
 
 end
 
-function BattleEndState:Update()
+function BattleEndState:OnUpdate()
 
 end
 
-function BattleEndState:OnLeave()
+function BattleEndState:OnExit()
 
 end

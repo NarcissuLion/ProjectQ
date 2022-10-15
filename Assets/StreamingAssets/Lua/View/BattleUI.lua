@@ -1,3 +1,4 @@
+local Notifier = require 'Framework.Notifier'
 BattleUI = {}
 BattleUI.__index = BattleUI
 setmetatable(BattleUI, ViewBase)
@@ -19,6 +20,22 @@ function BattleUI:Init()
     self.root = self:Add("Prefab/UI/Battle/BattleUI")
     self.hero = {}
     self:CreatePlayer()
+    self:AddListener()
+end
+
+function BattleUI:AddListener()
+    Notifier.AddListener("SetHeroSelectOff",self.SetHeroSelectOff, self)
+    Notifier.AddListener("SetHeroSelectedOff",self.SetHeroSelectedOff, self)
+    Notifier.AddListener("SetHeroSelect",self.SetHeroSelect, self)
+    Notifier.AddListener("ShowCure",self.ShowCure, self)
+    Notifier.AddListener("ShowDamage",self.ShowDamage, self)
+    Notifier.AddListener("RefreshHero",self.RefreshHero, self)
+    Notifier.AddListener("OnSelectSkill",self.OnSelectSkill, self)
+    Notifier.AddListener("SetHeroTempMove",self.SetHeroTempMove, self)
+    Notifier.AddListener("RefreshAllHero",self.RefreshAllHero, self)
+    Notifier.AddListener("MoveHero",self.MoveHero, self)
+    Notifier.AddListener("ShowDead",self.ShowDead, self)
+    Notifier.AddListener("ShowEffectText",self.ShowEffectText, self)
 end
 
 function BattleUI:CreatePlayer()
@@ -52,6 +69,8 @@ end
 function BattleUI:RefreshHero(pos)
     local heroData = BattleManager:GetHeroByPos(pos , false)
     local player = self.hero[pos]
+    CommonUtil.SetActive(player,"Img",true)
+    CommonUtil.SetActive(player,"Img2",false)
     if heroData == nil then
         CommonUtil.SetActive(player , nil , false)
         return
@@ -77,7 +96,7 @@ function BattleUI:RefreshHero(pos)
     CommonUtil.SetImageFillAmount(player, "HpBar/Image" , heroData.hp/maxHp)
     if heroData.isOwn then
         CommonUtil.AddButtonClick(player, "SelectedCure", BindFunction(self, self.OnClickUseSkillToHero, heroData.uuid))
-        CommonUtil.AddButtonClick(player, "SelectedMove", BindFunction(self, self.OnSelectMove, heroData.pos))
+        -- CommonUtil.AddButtonClick(player, "SelectedMove", BindFunction(self, self.OnSelectMove, heroData.pos))
     else
         CommonUtil.AddButtonClick(player, "Btn", BindFunction(self, BattleManager.topView.SetEnemyInfo, heroData.uuid))
         CommonUtil.AddButtonClick(player, "Selected", BindFunction(self, self.OnClickUseSkillToHero, heroData.uuid))
@@ -167,17 +186,22 @@ function BattleUI:SetHeroTempMove(nowPos , newPos)
     BattleManager.topView:SetSkillSelect()
 end
 
-function BattleUI:OnClickUseSkillToHero(uuid)
-    BattleManager:UseSkillToHero(BattleManager.topView.selectSkillIndex , uuid)
+function BattleUI:OnSelectSkill(selectSkillIndex , newPos)
+    self.selectSkillIndex = selectSkillIndex
+    self.newPos = newPos
+end
+function BattleUI:OnClickUseSkillToHero(targetUuid)
+    Notifier.Dispatch("InputOver" , self.selectSkillIndex , targetUuid , self.newPos)
+    -- BattleManager:UseSkillToHero(self.selectSkillIndex , uuid)
 end
 
-function BattleUI:OnClickMove(heroData)
-    BattleManager.topView:SetSkillSelect()
-    if heroData.move == 0 then
-        return
-    end
-    self:ShowMoveSelect(heroData)
-end
+-- function BattleUI:OnClickMove(heroData)
+--     BattleManager.topView:SetSkillSelect()
+--     if heroData.move == 0 then
+--         return
+--     end
+--     self:ShowMoveSelect(heroData)
+-- end
 
 function BattleUI:ShowMoveSelect(heroData)
     self:SetHeroSelectedOff()
@@ -200,9 +224,9 @@ function BattleUI:ShowMoveSelect(heroData)
     end
 end
 
-function BattleUI:OnSelectMove(moveTo)
-    BattleManager:OwnMove(moveTo)
-end
+-- function BattleUI:OnSelectMove(moveTo)
+--     BattleManager:OwnMove(moveTo)
+-- end
 
 function BattleUI:ExchangeHero(pos1 , pos2)
     --播动画
@@ -215,4 +239,37 @@ function BattleUI:ExchangeHero(pos1 , pos2)
         self.hero[pos1].transform.position = position1
         self.hero[pos2].transform.position = position2
     end,0.8) 
+end
+
+function BattleUI:MoveHero(pos1 , pos2 , time)
+    local nowPositon = self.hero[pos1].transform.position
+    local targetPos= self.hero[pos2].transform.position
+    CommonUtil.DOMove(self.hero[pos1],nil , targetPos , 0.8)
+    if time ~= nil then
+        AsyncCall(function ()
+            self.hero[pos1].transform.position = nowPositon
+            BattleManager:ExchangeHero(pos1,pos2)
+            self:RefreshAllHero()
+        end,time)
+    end     
+end
+
+function BattleUI:ShowDead(pos)
+    CommonUtil.DoImageFade(self.hero[pos],"Img" , 0 ,1)
+    CommonUtil.DoImageFade(self.hero[pos],"HpBar" , 0 ,1)
+    CommonUtil.DoImageFade(self.hero[pos],"HpBar/Image" , 0 ,1)
+    AsyncCall(function ()
+        CommonUtil.DoImageFade(self.hero[pos],"Img" , 1 ,0)
+        CommonUtil.DoImageFade(self.hero[pos],"HpBar" , 1 ,0)
+        CommonUtil.DoImageFade(self.hero[pos],"HpBar/Image" ,1 ,0)
+    end , 1)
+end
+
+function BattleUI:ShowEffectText(pos , text)
+    CommonUtil.SetText(self.hero[pos],"EffectText" ,text)
+    CommonUtil.DOLocalMoveY(self.hero[pos],"EffectText" , 380 , 3)
+    CommonUtil.DoTextFadeFromTo(self.hero[pos],"EffectText" , 1 , 0 ,3)
+    AsyncCall(function ()
+        CommonUtil.SetAnchoredPositionY(self.hero[pos],"EffectText" , 90)
+    end , 4)
 end

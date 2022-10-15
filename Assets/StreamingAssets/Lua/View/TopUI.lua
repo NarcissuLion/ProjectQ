@@ -1,10 +1,19 @@
+local Notifier = require 'Framework.Notifier'
 TopUI = {}
 TopUI.__index = TopUI
 
 function TopUI:Create()
     self.root = GameUtil.CreatePrefab("Prefab/UI/Battle/TopUI")
     ViewManager:AddToTopCanvas(self.root , true)
+    self:AddListener()
     return self
+end
+
+function TopUI:AddListener()
+    Notifier.AddListener("SetRound",self.SetRound , self)
+    Notifier.AddListener("SetOwnInfo",self.SetOwnInfo , self)
+    Notifier.AddListener("SetEnemyInfo",self.SetEnemyInfo , self)
+    Notifier.AddListener("SetSkillSelect",self.SetSkillSelect , self)
 end
 
 function TopUI:SetRound(index)
@@ -19,14 +28,14 @@ function TopUI:SetRound(index)
     end ,0.5)
 end
 
-function TopUI:SetOwnInfo(heroData,newPos)
+function TopUI:SetOwnInfo(heroData , newPos)
     local ownInfo = CommonUtil.GetChild(self.root,"UI/Own")
     CommonUtil.SetActive(ownInfo ,nil, heroData ~= nil)
     if heroData == nil then
         return
     end
-    CommonUtil.SetActive(ownInfo ,nil, heroData.isDead == nil)
-    if heroData.isDead ~= nil then
+    CommonUtil.SetActive(ownInfo ,nil, not heroData.isDead)
+    if heroData.isDead then
         return
     end
 
@@ -83,32 +92,32 @@ function TopUI:SetOwnInfo(heroData,newPos)
 
             --判断技能哪些可以用
             local canUse = false
-            if BattleManager.ownTurn then
-                --检查被攻击的位置是否有人
-                if skillConfig.range == "own" then
-                    canUse = true
-                end
-                if skillConfig.range == "all" then
-                    canUse = true
-                end
-                local atkPos = BattleManager:GetNowAtkPos(heroData.pos,newPos , skillConfig)
-                for index, pos in pairs(atkPos) do
-                    local heroData = BattleManager:GetHeroByPos(pos)
-                    if heroData ~= nil and heroData.isDead == nil then
-                        if skillConfig.typ == "cure" then
-                            if heroData.isOwn then
-                                canUse = true
-                                break                                
-                            end
-                        else
-                            if not heroData.isOwn then
-                                canUse = true
-                                break                                
-                            end
-                        end                        
-                    end
+
+            --检查被攻击的位置是否有人
+            if skillConfig.range == "own" then
+                canUse = true
+            end
+            if skillConfig.range == "all" then
+                canUse = true
+            end
+            local atkPos = BattleManager:GetNowAtkPos(heroData.pos,newPos , skillConfig)
+            for index, pos in pairs(atkPos) do
+                local heroData = BattleManager:GetHeroByPos(pos)
+                if heroData ~= nil and not heroData.isDead then
+                    if skillConfig.typ == "cure" then
+                        if heroData.isOwn then
+                            canUse = true
+                            break                                
+                        end
+                    else
+                        if not heroData.isOwn then
+                            canUse = true
+                            break                                
+                        end
+                    end                        
                 end
             end
+
             self:SetOwnSkillEnable(i , canUse)
 
             --设置cd
@@ -163,11 +172,9 @@ function TopUI:SetSkillSelect(index , skillConfig , nowPos , newPos)
         return
     end
 
-    self.selectSkillIndex = index
+    Notifier.Dispatch("OnSelectSkill" , index , newPos)
     CommonUtil.SetActive(self.root,"UI/Own/Skill/" .. index .. "/Select",true)
-
-    BattleManager.view:SetHeroSelectedOff()
-    self.newPos = newPos
+    Notifier.Dispatch("SetHeroSelectedOff")
 
     local atkPos = BattleManager:GetNowAtkPos(nowPos , newPos , skillConfig)
     if skillConfig.typ == "cure" then
@@ -184,7 +191,7 @@ function TopUI:SetSkillSelect(index , skillConfig , nowPos , newPos)
     elseif skillConfig.typ == "atk" then
         for key, pos in pairs(atkPos) do
             local heroData = BattleManager:GetHeroByPos(pos,false)
-            if heroData ~= nil and heroData.isDead == nil and not heroData.isOwn then
+            if heroData ~= nil and not heroData.isDead and not heroData.isOwn then
                 BattleManager.view:SetHeroSelect(pos , "Selected")
             end
         end

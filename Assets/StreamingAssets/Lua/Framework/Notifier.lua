@@ -47,11 +47,13 @@ function Notifier.Dispatch(notiName, ...)
     if callbacks == nil then
         return
     end
+
+    local param = {...}
     for _,callback in ipairs(callbacks) do
         if callback.owner == nil then
-            callback.func(...)
+            callback.func(param[1],param[2],param[3],param[4],param[5])
         else
-            callback.func(callback.owner, ...)
+            callback.func(callback.owner, param[1],param[2],param[3],param[4],param[5])
         end
     end
 end
