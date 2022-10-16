@@ -177,7 +177,7 @@ function TopUI:SetSkillSelect(index , skillConfig , nowPos , newPos)
     Notifier.Dispatch("SetHeroSelectedOff")
 
     local atkPos = BattleManager:GetNowAtkPos(nowPos , newPos , skillConfig)
-    if skillConfig.typ == "cure" then
+    if skillConfig.typ == "cure" or skillConfig.typ == "buff" then
         for key, pos in pairs(atkPos) do
             if pos == 0 then
                 BattleManager.view:SetHeroSelect(nowPos , "SelectedCure")
@@ -190,9 +190,9 @@ function TopUI:SetSkillSelect(index , skillConfig , nowPos , newPos)
         end
     elseif skillConfig.typ == "atk" then
         for key, pos in pairs(atkPos) do
-            local heroData = BattleManager:GetHeroByPos(pos,false)
+            local heroData = BattleManager:GetHeroByPos(pos)
             if heroData ~= nil and not heroData.isDead and not heroData.isOwn then
-                BattleManager.view:SetHeroSelect(pos , "Selected")
+                BattleManager.view:SetHeroSelect(heroData.pos , "Selected")
             end
         end
     end

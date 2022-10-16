@@ -78,5 +78,13 @@
 	"cd":3,
 	"dmg":[100,120],
 	"range":"all"
-	}
+},
+"b1":{
+	"typ":"buff",
+	"name":"嘲讽",
+	"atkPos":[0],
+	"cd":1,
+	"dmg":[0,0],
+	"range":"own"
+}
 }

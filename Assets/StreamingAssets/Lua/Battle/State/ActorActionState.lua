@@ -26,28 +26,7 @@ function ActorActionState:OnEnter(skillId , atkPos , movePos)
 
     -- add by lvfeng. 先按DD2的运镜来点意思
     Notifier.Dispatch("CameraFocusAction")
-    
-    local isSpecial = self:PlaySpecialSkillEffect(skillId)
-    if not isSpecial then
-        -- 选中对象
-        local minPos = 8
-        for index, p in ipairs(self.atkPos) do
-            Notifier.Dispatch("SetHeroSelect" , p , "Selected")
-
-            local dmg = self.hero:GetDmg(skillId)                
-            local otherHero = self.battle:GetHeroByPos(p)
-            otherHero:ChangeState("HurtState" , dmg)
-            if p<minPos then
-                minPos = p
-            end
-        end
-        --动摄像机
-        -- BattleManager:MoveCamera(self.hero.pos , minPos)
-        --刷新自己面板
-        Notifier.Dispatch("SetOwnInfo" , self.battle:GetHeroData(self.battle.ownInfoUuid))
-        -- todoUpdate
-        self.battle:ChangeState(BattleState.ActorEnd)
-    end    
+    self:PlaySkillEffect(skillId)
 end
 
 function ActorActionState:Dispose()
@@ -56,7 +35,7 @@ end
 
 function ActorActionState:OnUpdate()
     for index, hero in ipairs(self.hero) do
-        if hero.state ~= HeroState.IdelState or hero.state == HeroState.DeadState then
+        if hero.state ~= HeroState.IdelState or hero.state ~= HeroState.DeadState then
             return
         end
     end
@@ -68,7 +47,7 @@ function ActorActionState:OnExit()
 
 end
 
-function ActorActionState:PlaySpecialSkillEffect(skillId)
+function ActorActionState:PlaySkillEffect(skillId)
     if skillId == "s1" then
         local eatNum = 0
         for index, hero in ipairs(self.battle.hero) do
@@ -99,10 +78,27 @@ function ActorActionState:PlaySpecialSkillEffect(skillId)
 
         --刷新自己面板
         Notifier.Dispatch("SetOwnInfo" , self.battle:GetHeroData(self.battle.ownInfoUuid))
-        -- todoUpdate
-        self.battle:ChangeState(BattleState.ActorEnd)
-        return true
+    elseif skillId == "b1" then
+        local text = "嘲讽"
+        Notifier.Dispatch("ShowEffectText" , self.hero.pos , text)
+        Notifier.Dispatch("ShowBuff1" , self.hero.pos , true)
+        self.hero:SetBuff("Buff1" , 1)
+    else
+        -- 选中对象
+        local minPos = 8
+        for index, p in ipairs(self.atkPos) do
+            Notifier.Dispatch("SetHeroSelect" , p , "Selected")
         
+            local dmg = self.hero:GetDmg(skillId)                
+            local otherHero = self.battle:GetHeroByPos(p)
+            otherHero:ChangeState("HurtState" , dmg)
+            if p<minPos then
+                minPos = p
+            end
+        end
+        --动摄像机
+        -- BattleManager:MoveCamera(self.hero.pos , minPos)
+        --刷新自己面板
+        Notifier.Dispatch("SetOwnInfo" , self.battle:GetHeroData(self.battle.ownInfoUuid))
     end
-    return false
 end

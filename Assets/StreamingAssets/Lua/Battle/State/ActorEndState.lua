@@ -18,17 +18,11 @@ function ActorEndState:Init()
 end
 
 function ActorEndState:OnEnter()
+    self.isEnd = false
     self.hero = self.battle.nowActionHero
     self.hero:OnActionEnd()
 
-    -- add by lvfeng. 暂时在这里加一点时间来缓冲一下回合间节奏
-    if self.delayTimer == nil then
-        self.delayTimer = Timer.Create(2, 1, function()
-            -- todoUpdate
-            self.battle:ChangeState(BattleState.Round)
-        end)
-    end
-    self.delayTimer:Play()
+    
 end
 
 function ActorEndState:Dispose()
@@ -36,8 +30,15 @@ function ActorEndState:Dispose()
 end
 
 function ActorEndState:OnUpdate()
-    if not self.hero.isPlayAction then
-        self.battle:ChangeState(BattleState.Round)
+    if not self.hero.isPlayAction and not self.isEnd then
+        self.isEnd = true
+        -- add by lvfeng. 暂时在这里加一点时间来缓冲一下回合间节奏
+        if self.delayTimer == nil then
+            self.delayTimer = Timer.Create(2, 1, function()
+                self.battle:ChangeState(BattleState.Round)
+            end)
+        end
+        self.delayTimer:Play()
     end
 end
 

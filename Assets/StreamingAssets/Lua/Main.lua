@@ -58,6 +58,7 @@ end
 
 function OnUpdate(deltaTime)
     Timer.UpdateAll(deltaTime)
+    BattleManager:Update()
 end
 
 -- ���������¼�

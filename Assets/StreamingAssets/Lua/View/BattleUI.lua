@@ -36,6 +36,7 @@ function BattleUI:AddListener()
     Notifier.AddListener("MoveHero",self.MoveHero, self)
     Notifier.AddListener("ShowDead",self.ShowDead, self)
     Notifier.AddListener("ShowEffectText",self.ShowEffectText, self)
+    Notifier.AddListener("ShowBuff1",self.ShowBuff1, self)    
 end
 
 function BattleUI:CreatePlayer()
@@ -272,4 +273,8 @@ function BattleUI:ShowEffectText(pos , text)
     AsyncCall(function ()
         CommonUtil.SetAnchoredPositionY(self.hero[pos],"EffectText" , 90)
     end , 4)
+end
+
+function BattleUI:ShowBuff1(pos , isShow)
+    CommonUtil.SetActive(self.hero[pos] , "Buff1" , isShow)
 end

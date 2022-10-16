@@ -78,6 +78,13 @@ function BattleManager:GetHeroData(id)
     printError("找不到uuid"..id.."的英雄")
 end
 
+function BattleManager:Update()
+    self.fsmManager:Update()
+    for _, hero in pairs(self.hero) do
+        hero.fsmManager:Update()
+    end
+end
+
 -- function BattleManager:GetHeroSpd(id)
 --     local heroData = self:GetHeroData(id)
 --     return heroData.spd

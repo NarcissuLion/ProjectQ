@@ -85,6 +85,18 @@ function HeroControler:OnRoundEnd()
             end
         end
     end
+
+    if self.buff ~= nil then
+        for index, buff in ipairs(self.buff) do
+            buff.round = buff.round - 1
+            if buff.round <= 0 then
+                if self.buff.name == "buff1" then
+                    Notifier.Dispatch("ShowBuff1" , self.hero.pos , false)
+                end
+                self.buff[index] = nil
+            end
+        end
+    end
 end
 
 function HeroControler:OnActionStart()
@@ -93,6 +105,10 @@ end
 
 function HeroControler:OnActionEnd()
     
+end
+
+function HeroControler:Update()
+    self.fsmManager:Update()
 end
 
 
@@ -125,4 +141,14 @@ function HeroControler:GetDmg(skillId)
     elseif skillConfig.typ == "cure" then
         return math.random(skillConfig.dmg[1] ,skillConfig.dmg[2] )
     end
+end
+
+function HeroControler:SetBuff(buffName , round)
+    if self.buff == nil then
+        self.buff = {}
+    end
+    local buff = {}
+    buff.name = buffName
+    buff.round = round + 1
+    table.insert(self.buff , buff)
 end

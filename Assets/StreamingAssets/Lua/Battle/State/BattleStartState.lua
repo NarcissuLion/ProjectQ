@@ -27,11 +27,6 @@ function BattleStartState:OnEnter()
     for key, hero in pairs(self.battle.hero) do
         hero:ChangeState(HeroState.IdelState)
     end
-    -- todoUpdate
-    for index, hero in ipairs(self.orderHero) do
-        hero:OnBattleStart()
-    end
-    self.battle:ChangeState(BattleState.RoundStart)
 end
 
 function BattleStartState:Dispose()

@@ -43,6 +43,7 @@ function ActorAIState:DoAI(heroData)
             self.hero.skillCD[skillIndex] = skillConfig.cd + 1
         end
         local atkPos = self:RandomAtkPos(skillId , heroData.pos)
+        printJson(atkPos)
         self.battle:ChangeState(BattleState.ActorAction , skillId , atkPos)
     else
         self.battle:ChangeState(BattleState.ActorEnd)
@@ -129,13 +130,32 @@ function ActorAIState:RandomAtkPos(skillId,selfPos)
         for index, pos in ipairs(trueAtkPos) do
             local heroData = self.battle:GetHeroByPos(pos)
             if heroData ~= nil and not heroData.isDead then
-                table.insert(posArr , pos)
+                if heroData.typ == "cure" then
+                    if not heroData.isOwn then
+                        table.insert(posArr , pos)
+                    end
+                else
+                    if heroData.isOwn then
+                        table.insert(posArr , pos)
+                    end
+                end
             end
         end
 
         if skillConfig.range == "aoe" then
             return posArr
         else
+            for index, pos in ipairs(posArr) do
+                local hero = BattleManager:GetHeroByPos(pos)
+                if hero.buff ~= nil  then
+                    for index, buff in ipairs(hero.buff) do
+                        buff.name = "buff1"
+                        local tmp 
+                        table.insert(tmp , pos)
+                        return tmp
+                    end
+                end                
+            end
             return self:GetRandomOne(posArr)
         end
     end

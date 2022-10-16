@@ -20,6 +20,7 @@ function RoundState:OnEnter(orderHero)
     if orderHero ~= nil then
         self.orderHero = orderHero
     end
+
     print("第"..self.battle.roundIndex .. "回合中...")
     Notifier.Dispatch("SetHeroSelectOff")
 

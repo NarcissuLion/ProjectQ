@@ -23,17 +23,6 @@ function RoundStartState:OnEnter()
     self.battle.roundIndex = self.battle.roundIndex == nil and 1 or self.battle.roundIndex + 1
     print("进入第"..self.battle.roundIndex.."回合")
     Notifier.Dispatch("SetRound" , self.battle.roundIndex)
-    -- todoUpdate
-    for index, hero in ipairs(self.orderHero) do
-        hero:OnRoundStart()
-    end
-
-    if self.delayTimer == nil then
-        self.delayTimer = Timer.Create(1, 1, function()
-            self.battle:ChangeState(BattleState.Round , self.orderHero)
-        end)
-    end
-    self.delayTimer:Play()
 end
 
 function RoundStartState:Dispose()
@@ -50,7 +39,7 @@ end
 
 function RoundStartState:PlayBuff()
     if #self.orderHero == 0 then
-        self.battle:ChangeState(BattleState.Round , self.orderHero)
+        self.battle:ChangeState(BattleState.Round , self.battle:OrderHero())
         return
     end
     self.orderHero[1]:OnRoundStart()

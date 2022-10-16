@@ -18,11 +18,6 @@ end
 function RoundEndState:OnEnter()
     self.orderHero = self.battle:OrderHero()    
     print(self.battle.roundIndex .. "回合结束")
-    -- todoUpdate
-    for index, hero in ipairs(self.orderHero) do
-        hero:OnRoundEnd()
-    end
-    self.battle:ChangeState(BattleState.RoundStart)
 end
 
 function RoundEndState:Dispose()

@@ -22,27 +22,21 @@ function ActorStartState:OnEnter()
     Notifier.Dispatch("SetHeroSelect" , self.hero.pos , "Select")
     Notifier.Dispatch("SetSkillSelect" )
     self.hero:OnActionStart()
-    -- todoUpdate
-    if self.hero.isOwn then
-        -- add by lvfeng, 先按DD2的运镜来点意思
-        Notifier.Dispatch("CameraFocusLeft")
-        self.battle:ChangeState(BattleState.ActorInput)
-    else
-        -- add by lvfeng, 先按DD2的运镜来点意思
-        Notifier.Dispatch("CameraFocusRight")
-        self.battle:ChangeState(BattleState.ActorAI)
-    end
 end
 
 function ActorStartState:Dispose()
 
 end
 
-function ActorStartState:OnUpdate()    
+function ActorStartState:OnUpdate()
     if not self.hero.isPlayAction then
         if self.hero.isOwn then
+            -- add by lvfeng, 先按DD2的运镜来点意思
+            Notifier.Dispatch("CameraFocusLeft")
             self.battle:ChangeState(BattleState.ActorInput)
         else
+            -- add by lvfeng, 先按DD2的运镜来点意思
+            Notifier.Dispatch("CameraFocusRight")
             self.battle:ChangeState(BattleState.ActorAI)
         end
     end
