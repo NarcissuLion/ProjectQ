@@ -126,7 +126,29 @@ namespace XLua
 #endif
 		}
         
-		public void __Gen_Delegate_Imp5(string p0, long p1, string p2)
+		public void __Gen_Delegate_Imp5(float p0)
+		{
+#if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+#endif
+                RealStatePtr L = luaEnv.rawL;
+                int errFunc = LuaAPI.pcall_prepare(L, errorFuncRef, luaReference);
+                
+                LuaAPI.lua_pushnumber(L, p0);
+                
+                PCall(L, 1, 0, errFunc);
+                
+                
+                
+                LuaAPI.lua_settop(L, errFunc - 1);
+                
+#if THREAD_SAFE || HOTFIX_ENABLE
+            }
+#endif
+		}
+        
+		public void __Gen_Delegate_Imp6(string p0, long p1, string p2)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -150,7 +172,7 @@ namespace XLua
 #endif
 		}
         
-		public UnityEngine.GameObject __Gen_Delegate_Imp6()
+		public UnityEngine.GameObject __Gen_Delegate_Imp7()
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -171,7 +193,7 @@ namespace XLua
 #endif
 		}
         
-		public void __Gen_Delegate_Imp7(UnityEngine.GameObject p0, int p1)
+		public void __Gen_Delegate_Imp8(UnityEngine.GameObject p0, int p1)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -238,19 +260,24 @@ namespace XLua
 			    return new LuaClient.OnOnApplicationFocus(__Gen_Delegate_Imp4);
 			}
 		
+		    if (type == typeof(LuaClient.OnUpdate))
+			{
+			    return new LuaClient.OnUpdate(__Gen_Delegate_Imp5);
+			}
+		
 		    if (type == typeof(HttpManager.Callback))
 			{
-			    return new HttpManager.Callback(__Gen_Delegate_Imp5);
+			    return new HttpManager.Callback(__Gen_Delegate_Imp6);
 			}
 		
 		    if (type == typeof(GridView.OnCreateItem))
 			{
-			    return new GridView.OnCreateItem(__Gen_Delegate_Imp6);
+			    return new GridView.OnCreateItem(__Gen_Delegate_Imp7);
 			}
 		
 		    if (type == typeof(GridView.OnUpdateItem))
 			{
-			    return new GridView.OnUpdateItem(__Gen_Delegate_Imp7);
+			    return new GridView.OnUpdateItem(__Gen_Delegate_Imp8);
 			}
 		
 		    return null;

@@ -1,5 +1,6 @@
 local FSMachine = require 'Framework.FSMachine'
 local Notifier = require 'Framework.Notifier'
+local Timer = require 'Framework.Timer'
 RoundStartState = {}
 RoundStartState.__index = RoundStartState
 setmetatable(RoundStartState, FSMachine.State)
@@ -26,7 +27,13 @@ function RoundStartState:OnEnter()
     for index, hero in ipairs(self.orderHero) do
         hero:OnRoundStart()
     end
-    self.battle:ChangeState(BattleState.Round , self.orderHero)
+
+    if self.timerCallback == nil then
+        self.timerCallback = function()
+            self.battle:ChangeState(BattleState.Round , self.orderHero)
+        end
+    end
+    local timer = Timer.Create(1, 1, self.timerCallback)
 end
 
 function RoundStartState:Dispose()

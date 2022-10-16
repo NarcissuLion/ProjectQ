@@ -33,6 +33,11 @@ public class LuaClient : MonoBehaviour {
     private static OnOnApplicationPause onApplicationPause;
     private static OnOnApplicationFocus onApplicationFocus;
 
+    // add by lvfeng，暂时先将lua里需要关联update的东西都挂在这里，之后正式框架里再考虑怎么安排
+    [CSharpCallLua]
+    public delegate void OnUpdate(float deltaTime);
+    private static OnUpdate onUpdate;
+
     private void Awake() {
         Instance = this;
     }
@@ -67,6 +72,8 @@ public class LuaClient : MonoBehaviour {
             onClick = luaEnv.Global.Get<OnClick>("OnClick");
             onApplicationPause = luaEnv.Global.Get<OnOnApplicationPause>("OnApplicationPause");
             onApplicationFocus = luaEnv.Global.Get<OnOnApplicationFocus>("OnApplicationFocus");
+            // add by lvfeng
+            onUpdate = luaEnv.Global.Get<OnUpdate>("OnUpdate");
 
             luaEnv.DoString("Main()");
 
@@ -81,6 +88,7 @@ public class LuaClient : MonoBehaviour {
             return;
         }
         luaEnv.Tick();
+        if (onUpdate != null) onUpdate(Time.deltaTime);
 
         //点击返回
         if (onClickEscape != null && Input.GetKeyUp(KeyCode.Escape)) {

@@ -40,8 +40,7 @@ require "Hero.HeroState.HurtState"
 require "Hero.HeroState.DyingState"
 require "Hero.HeroState.DeadState"
 
-require "Framework.Notifier"
-require "Framework.FSMachine"
+local Timer = require "Framework.Timer"
 
 
 local isPaused = false
@@ -55,6 +54,10 @@ end
 
 function BindUnloadSceneHandler(key, handler)
     unloadSceneHandlers[key] = handler
+end
+
+function OnUpdate(deltaTime)
+    Timer.UpdateAll(deltaTime)
 end
 
 -- ���������¼�
