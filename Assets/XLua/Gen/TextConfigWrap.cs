@@ -55,7 +55,7 @@ namespace XLua.CSObjectWrap
 				if(LuaAPI.lua_gettop(L) == 1)
 				{
 					
-					TextConfig gen_ret = new TextConfig();
+					var gen_ret = new TextConfig();
 					translator.Push(L, gen_ret);
                     
 					return 1;
@@ -174,7 +174,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _key = LuaAPI.lua_tostring(L, 2);
                     
-                        string gen_ret = gen_to_be_invoked.Get( _key );
+                        var gen_ret = gen_to_be_invoked.Get( _key );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -199,7 +199,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _source = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = TextConfig.UnicodeToWord( _source );
+                        var gen_ret = TextConfig.UnicodeToWord( _source );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     

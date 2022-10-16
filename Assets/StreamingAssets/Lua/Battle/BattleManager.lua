@@ -27,6 +27,8 @@ function BattleManager:Init(config)
     self.state = BattleState.BattleStart
     self.uuid = 0
     
+    local battleCamera = CS.UnityEngine.GameObject.Find("ViewManager").transform:Find("BattleCamera")
+    self.cameraCtrl = require("Battle.BattleCameraController").Create(battleCamera)
     self:InitState()
     self:ChangeState(self.state)
 end

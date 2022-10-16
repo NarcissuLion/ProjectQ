@@ -110,12 +110,12 @@ public class LuaClient : MonoBehaviour {
             onApplicationPause = null;
             onApplicationFocus = null;
 
-            List<System.WeakReference> list = new List<System.WeakReference>(luaEnv.translator.delegate_bridges.Values);
-            foreach (var reference in list) {
-                DelegateBridge bridge = reference.Target as DelegateBridge;
-                bridge.Dispose();
-            }
-            luaEnv.translator.delegate_bridges.Clear();
+            // List<System.WeakReference> list = new List<System.WeakReference>(luaEnv.translator.delegate_bridges.Values);
+            // foreach (var reference in list) {
+            //     DelegateBridge bridge = reference.Target as DelegateBridge;
+            //     bridge.Dispose();
+            // }
+            // luaEnv.translator.delegate_bridges.Clear();
 
             //luaEnv.DoString("(require 'xlua.util').print_func_ref_by_csharp()");
 

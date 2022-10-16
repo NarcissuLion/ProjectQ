@@ -23,6 +23,9 @@ function ActorActionState:OnEnter(skillId , atkPos , movePos)
     self.atkPos = atkPos
     self.movePos = movePos
     self.hero:ChangeState(HeroState.ActionState , skillId , movePos)
+
+    -- add by lvfeng. 先按DD2的运镜来点意思
+    Notifier.Dispatch("CameraFocusAction")
     
     local isSpecial = self:PlaySpecialSkillEffect(skillId)
     if not isSpecial then
@@ -39,7 +42,7 @@ function ActorActionState:OnEnter(skillId , atkPos , movePos)
             end
         end
         --动摄像机
-        BattleManager:MoveCamera(self.hero.pos , minPos)
+        -- BattleManager:MoveCamera(self.hero.pos , minPos)
         --刷新自己面板
         Notifier.Dispatch("SetOwnInfo" , self.battle:GetHeroData(self.battle.ownInfoUuid))
         -- todoUpdate

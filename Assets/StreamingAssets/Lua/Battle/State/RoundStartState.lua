@@ -28,12 +28,12 @@ function RoundStartState:OnEnter()
         hero:OnRoundStart()
     end
 
-    if self.timerCallback == nil then
-        self.timerCallback = function()
+    if self.delayTimer == nil then
+        self.delayTimer = Timer.Create(1, 1, function()
             self.battle:ChangeState(BattleState.Round , self.orderHero)
-        end
+        end)
     end
-    local timer = Timer.Create(1, 1, self.timerCallback)
+    self.delayTimer:Play()
 end
 
 function RoundStartState:Dispose()

@@ -72,7 +72,7 @@ namespace XLua.CSObjectWrap
 				if(LuaAPI.lua_gettop(L) == 1)
 				{
 					
-					HotfixDownloader gen_ret = new HotfixDownloader();
+					var gen_ret = new HotfixDownloader();
 					translator.Push(L, gen_ret);
                     
 					return 1;
@@ -105,7 +105,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        HotfixDownloader gen_ret = HotfixDownloader.CreateInstance(  );
+                        var gen_ret = HotfixDownloader.CreateInstance(  );
                         translator.Push(L, gen_ret);
                     
                     

@@ -109,7 +109,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _name = LuaAPI.lua_tostring(L, 1);
                     
-                        Newtonsoft.Json.Linq.JObject gen_ret = ConfigManager.GetConfig( _name );
+                        var gen_ret = ConfigManager.GetConfig( _name );
                         translator.Push(L, gen_ret);
                     
                     
@@ -136,7 +136,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _name = LuaAPI.lua_tostring(L, 1);
                     
-                        Newtonsoft.Json.Linq.JObject gen_ret = ConfigManager.GetSysConfig( _name );
+                        var gen_ret = ConfigManager.GetSysConfig( _name );
                         translator.Push(L, gen_ret);
                     
                     
@@ -163,7 +163,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _name = LuaAPI.lua_tostring(L, 1);
                     
-                        Newtonsoft.Json.Linq.JObject gen_ret = ConfigManager.LoadConfig( _name );
+                        var gen_ret = ConfigManager.LoadConfig( _name );
                         translator.Push(L, gen_ret);
                     
                     
@@ -190,7 +190,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _name = LuaAPI.lua_tostring(L, 1);
                     
-                        Newtonsoft.Json.Linq.JObject gen_ret = ConfigManager.LoadSysConfig( _name );
+                        var gen_ret = ConfigManager.LoadSysConfig( _name );
                         translator.Push(L, gen_ret);
                     
                     
@@ -216,7 +216,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        TextConfig gen_ret = ConfigManager.GetTextConfig(  );
+                        var gen_ret = ConfigManager.GetTextConfig(  );
                         translator.Push(L, gen_ret);
                     
                     
@@ -290,7 +290,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _fileName = LuaAPI.lua_tostring(L, 1);
                     
-                        Newtonsoft.Json.Linq.JObject gen_ret = ConfigManager.LoadBuiltinSysConfig( _fileName );
+                        var gen_ret = ConfigManager.LoadBuiltinSysConfig( _fileName );
                         translator.Push(L, gen_ret);
                     
                     

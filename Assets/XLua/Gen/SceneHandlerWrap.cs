@@ -55,7 +55,7 @@ namespace XLua.CSObjectWrap
 				if(LuaAPI.lua_gettop(L) == 1)
 				{
 					
-					SceneHandler gen_ret = new SceneHandler();
+					var gen_ret = new SceneHandler();
 					translator.Push(L, gen_ret);
                     
 					return 1;

@@ -324,7 +324,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Transform gen_ret = CommonUtil.GetChild( _parent, _path );
+                        var gen_ret = CommonUtil.GetChild( _parent, _path );
                         translator.Push(L, gen_ret);
                     
                     
@@ -352,7 +352,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        bool gen_ret = CommonUtil.HasChild( _parent, _path );
+                        var gen_ret = CommonUtil.HasChild( _parent, _path );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -380,7 +380,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Transform gen_ret = CommonUtil.GetTransform( _parent, _path );
+                        var gen_ret = CommonUtil.GetTransform( _parent, _path );
                         translator.Push(L, gen_ret);
                     
                     
@@ -408,7 +408,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.GameObject gen_ret = CommonUtil.GetGameObject( _parent, _path );
+                        var gen_ret = CommonUtil.GetGameObject( _parent, _path );
                         translator.Push(L, gen_ret);
                     
                     
@@ -437,7 +437,7 @@ namespace XLua.CSObjectWrap
                     string _path = LuaAPI.lua_tostring(L, 2);
                     string _type = LuaAPI.lua_tostring(L, 3);
                     
-                        UnityEngine.Component gen_ret = CommonUtil.GetComponent( _parent, _path, _type );
+                        var gen_ret = CommonUtil.GetComponent( _parent, _path, _type );
                         translator.Push(L, gen_ret);
                     
                     
@@ -466,7 +466,7 @@ namespace XLua.CSObjectWrap
                     string _path = LuaAPI.lua_tostring(L, 2);
                     int _index = LuaAPI.xlua_tointeger(L, 3);
                     
-                        UnityEngine.Transform gen_ret = CommonUtil.GetChildAt( _parent, _path, _index );
+                        var gen_ret = CommonUtil.GetChildAt( _parent, _path, _index );
                         translator.Push(L, gen_ret);
                     
                     
@@ -497,7 +497,7 @@ namespace XLua.CSObjectWrap
                     string _culture = LuaAPI.lua_tostring(L, 4);
                     string _publicKeyToken = LuaAPI.lua_tostring(L, 5);
                     
-                        string gen_ret = CommonUtil.GetAssemblyQualifiedName( _typeName, _typeAssembly, _version, _culture, _publicKeyToken );
+                        var gen_ret = CommonUtil.GetAssemblyQualifiedName( _typeName, _typeAssembly, _version, _culture, _publicKeyToken );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -511,7 +511,7 @@ namespace XLua.CSObjectWrap
                     string _version = LuaAPI.lua_tostring(L, 3);
                     string _culture = LuaAPI.lua_tostring(L, 4);
                     
-                        string gen_ret = CommonUtil.GetAssemblyQualifiedName( _typeName, _typeAssembly, _version, _culture );
+                        var gen_ret = CommonUtil.GetAssemblyQualifiedName( _typeName, _typeAssembly, _version, _culture );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -524,7 +524,7 @@ namespace XLua.CSObjectWrap
                     string _typeAssembly = LuaAPI.lua_tostring(L, 2);
                     string _version = LuaAPI.lua_tostring(L, 3);
                     
-                        string gen_ret = CommonUtil.GetAssemblyQualifiedName( _typeName, _typeAssembly, _version );
+                        var gen_ret = CommonUtil.GetAssemblyQualifiedName( _typeName, _typeAssembly, _version );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -536,7 +536,7 @@ namespace XLua.CSObjectWrap
                     string _typeName = LuaAPI.lua_tostring(L, 1);
                     string _typeAssembly = LuaAPI.lua_tostring(L, 2);
                     
-                        string gen_ret = CommonUtil.GetAssemblyQualifiedName( _typeName, _typeAssembly );
+                        var gen_ret = CommonUtil.GetAssemblyQualifiedName( _typeName, _typeAssembly );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -565,7 +565,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _typeName = LuaAPI.lua_tostring(L, 1);
                     
-                        System.Type gen_ret = CommonUtil.GetTypeByName( _typeName );
+                        var gen_ret = CommonUtil.GetTypeByName( _typeName );
                         translator.Push(L, gen_ret);
                     
                     
@@ -594,7 +594,7 @@ namespace XLua.CSObjectWrap
                     string _path = LuaAPI.lua_tostring(L, 2);
                     string _type = LuaAPI.lua_tostring(L, 3);
                     
-                        UnityEngine.Component gen_ret = CommonUtil.GetComponentInChildren( _parent, _path, _type );
+                        var gen_ret = CommonUtil.GetComponentInChildren( _parent, _path, _type );
                         translator.Push(L, gen_ret);
                     
                     
@@ -624,7 +624,7 @@ namespace XLua.CSObjectWrap
                     string _type = LuaAPI.lua_tostring(L, 3);
                     bool _includeInactive = LuaAPI.lua_toboolean(L, 4);
                     
-                        UnityEngine.Component[] gen_ret = CommonUtil.GetComponentsInChildren( _parent, _path, _type, _includeInactive );
+                        var gen_ret = CommonUtil.GetComponentsInChildren( _parent, _path, _type, _includeInactive );
                         translator.Push(L, gen_ret);
                     
                     
@@ -654,7 +654,7 @@ namespace XLua.CSObjectWrap
                     string _type = LuaAPI.lua_tostring(L, 3);
                     bool _allowMultiple = LuaAPI.lua_toboolean(L, 4);
                     
-                        UnityEngine.Component gen_ret = CommonUtil.AddComponent( _parent, _path, _type, _allowMultiple );
+                        var gen_ret = CommonUtil.AddComponent( _parent, _path, _type, _allowMultiple );
                         translator.Push(L, gen_ret);
                     
                     
@@ -1043,7 +1043,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        int gen_ret = CommonUtil.GetSiblingIndex( _parent, _path );
+                        var gen_ret = CommonUtil.GetSiblingIndex( _parent, _path );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
@@ -1547,7 +1547,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        bool gen_ret = CommonUtil.GetToggleValue( _parent, _path );
+                        var gen_ret = CommonUtil.GetToggleValue( _parent, _path );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -1746,7 +1746,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        int gen_ret = CommonUtil.GetDropdownValue( _parent, _path );
+                        var gen_ret = CommonUtil.GetDropdownValue( _parent, _path );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
@@ -1830,7 +1830,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        string gen_ret = CommonUtil.GetText( _parent, _path );
+                        var gen_ret = CommonUtil.GetText( _parent, _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -1858,7 +1858,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Color gen_ret = CommonUtil.GetTextColor( _parent, _path );
+                        var gen_ret = CommonUtil.GetTextColor( _parent, _path );
                         translator.PushUnityEngineColor(L, gen_ret);
                     
                     
@@ -2055,7 +2055,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        string gen_ret = CommonUtil.GetTextMesh( _parent, _path );
+                        var gen_ret = CommonUtil.GetTextMesh( _parent, _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -2111,7 +2111,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Color gen_ret = CommonUtil.GetTextMeshColor( _parent, _path );
+                        var gen_ret = CommonUtil.GetTextMeshColor( _parent, _path );
                         translator.PushUnityEngineColor(L, gen_ret);
                     
                     
@@ -2167,7 +2167,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Sprite gen_ret = CommonUtil.GetImage( _parent, _path );
+                        var gen_ret = CommonUtil.GetImage( _parent, _path );
                         translator.Push(L, gen_ret);
                     
                     
@@ -2279,7 +2279,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Texture gen_ret = CommonUtil.GetRawImage( _parent, _path );
+                        var gen_ret = CommonUtil.GetRawImage( _parent, _path );
                         translator.Push(L, gen_ret);
                     
                     
@@ -2391,7 +2391,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Sprite gen_ret = CommonUtil.GetSprite( _parent, _path );
+                        var gen_ret = CommonUtil.GetSprite( _parent, _path );
                         translator.Push(L, gen_ret);
                     
                     
@@ -2447,7 +2447,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Color gen_ret = CommonUtil.GetSpriteColor( _parent, _path );
+                        var gen_ret = CommonUtil.GetSpriteColor( _parent, _path );
                         translator.PushUnityEngineColor(L, gen_ret);
                     
                     
@@ -2698,7 +2698,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        string gen_ret = CommonUtil.GetInputFieldText( _parent, _path );
+                        var gen_ret = CommonUtil.GetInputFieldText( _parent, _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -2754,7 +2754,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        bool gen_ret = CommonUtil.ToggleInputFieldPasswordType( _parent, _path );
+                        var gen_ret = CommonUtil.ToggleInputFieldPasswordType( _parent, _path );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -2809,7 +2809,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        bool gen_ret = CommonUtil.IsActiveSelf( _parent, _path );
+                        var gen_ret = CommonUtil.IsActiveSelf( _parent, _path );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -3031,7 +3031,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Material gen_ret = CommonUtil.GetRendererMateiral( _parent, _path );
+                        var gen_ret = CommonUtil.GetRendererMateiral( _parent, _path );
                         translator.Push(L, gen_ret);
                     
                     
@@ -3286,7 +3286,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Camera _uiCamera = (UnityEngine.Camera)translator.GetObject(L, 3, typeof(UnityEngine.Camera));
                     bool _isScreenOverlay = LuaAPI.lua_toboolean(L, 4);
                     
-                        bool gen_ret = CommonUtil.IsOverlapsViewport( _transform, _viewport, _uiCamera, _isScreenOverlay );
+                        var gen_ret = CommonUtil.IsOverlapsViewport( _transform, _viewport, _uiCamera, _isScreenOverlay );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -4753,7 +4753,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        string gen_ret = CommonUtil.NewGuid(  );
+                        var gen_ret = CommonUtil.NewGuid(  );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -4777,7 +4777,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        string gen_ret = CommonUtil.GetActiveSceneName(  );
+                        var gen_ret = CommonUtil.GetActiveSceneName(  );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -4801,7 +4801,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        int gen_ret = CommonUtil.GetActiveSceneIndex(  );
+                        var gen_ret = CommonUtil.GetActiveSceneIndex(  );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
@@ -5154,7 +5154,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Canvas gen_ret = CommonUtil.LookUpCanvas( _parent, _path );
+                        var gen_ret = CommonUtil.LookUpCanvas( _parent, _path );
                         translator.Push(L, gen_ret);
                     
                     
@@ -5179,7 +5179,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _fileName = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = CommonUtil.GetMD5FromFile( _fileName );
+                        var gen_ret = CommonUtil.GetMD5FromFile( _fileName );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -5204,7 +5204,7 @@ namespace XLua.CSObjectWrap
                 {
                     byte[] _rawData = LuaAPI.lua_tobytes(L, 1);
                     
-                        string gen_ret = CommonUtil.GetMD5FromData( _rawData );
+                        var gen_ret = CommonUtil.GetMD5FromData( _rawData );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -5229,7 +5229,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _str = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = CommonUtil.GetMD5FromStr( _str );
+                        var gen_ret = CommonUtil.GetMD5FromStr( _str );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -5253,7 +5253,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        int gen_ret = CommonUtil.GetSleepTimeout(  );
+                        var gen_ret = CommonUtil.GetSleepTimeout(  );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
@@ -5303,7 +5303,7 @@ namespace XLua.CSObjectWrap
                     string _xml = LuaAPI.lua_tostring(L, 1);
                     bool _prettyPrint = LuaAPI.lua_toboolean(L, 2);
                     
-                        string gen_ret = CommonUtil.XmlToJson( _xml, _prettyPrint );
+                        var gen_ret = CommonUtil.XmlToJson( _xml, _prettyPrint );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -5330,7 +5330,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _xml = LuaAPI.lua_tostring(L, 1);
                     
-                        Newtonsoft.Json.Linq.JArray gen_ret = CommonUtil.XmlToJsonData( _xml );
+                        var gen_ret = CommonUtil.XmlToJsonData( _xml );
                         translator.Push(L, gen_ret);
                     
                     
@@ -5378,7 +5378,7 @@ namespace XLua.CSObjectWrap
                 {
                     double _size = LuaAPI.lua_tonumber(L, 1);
                     
-                        string gen_ret = CommonUtil.GetFileSize( _size );
+                        var gen_ret = CommonUtil.GetFileSize( _size );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -5405,7 +5405,7 @@ namespace XLua.CSObjectWrap
                     string _from = LuaAPI.lua_tostring(L, 2);
                     string _to = LuaAPI.lua_tostring(L, 3);
                     
-                        string gen_ret = CommonUtil.SubStringFromTo( _str, _from, _to );
+                        var gen_ret = CommonUtil.SubStringFromTo( _str, _from, _to );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -5432,7 +5432,7 @@ namespace XLua.CSObjectWrap
                     string _from = LuaAPI.lua_tostring(L, 2);
                     string _to = LuaAPI.lua_tostring(L, 3);
                     
-                        string gen_ret = CommonUtil.SubStringFromLastTo( _str, _from, _to );
+                        var gen_ret = CommonUtil.SubStringFromLastTo( _str, _from, _to );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -5458,7 +5458,7 @@ namespace XLua.CSObjectWrap
                     string _text = LuaAPI.lua_tostring(L, 1);
                     string _str = LuaAPI.lua_tostring(L, 2);
                     
-                        bool gen_ret = CommonUtil.Contains( _text, _str );
+                        var gen_ret = CommonUtil.Contains( _text, _str );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -5486,7 +5486,7 @@ namespace XLua.CSObjectWrap
                     string _text = LuaAPI.lua_tostring(L, 1);
                     object[] _args = translator.GetParams<object>(L, 2);
                     
-                        string gen_ret = CommonUtil.FormatText( _text, _args );
+                        var gen_ret = CommonUtil.FormatText( _text, _args );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -5536,7 +5536,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _text = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = CommonUtil.Trim( _text );
+                        var gen_ret = CommonUtil.Trim( _text );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -5563,7 +5563,7 @@ namespace XLua.CSObjectWrap
                     string _oldStr = LuaAPI.lua_tostring(L, 2);
                     string _newStr = LuaAPI.lua_tostring(L, 3);
                     
-                        string gen_ret = CommonUtil.ReplaceStr( _str, _oldStr, _newStr );
+                        var gen_ret = CommonUtil.ReplaceStr( _str, _oldStr, _newStr );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -5588,7 +5588,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _str = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = CommonUtil.ReplaceNonBreakingSpaces( _str );
+                        var gen_ret = CommonUtil.ReplaceNonBreakingSpaces( _str );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -5613,7 +5613,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _str = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = CommonUtil.EscapeRichText( _str );
+                        var gen_ret = CommonUtil.EscapeRichText( _str );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -5641,7 +5641,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Vector2 gen_ret = CommonUtil.GetTextPrefferdSize( _parent, _path );
+                        var gen_ret = CommonUtil.GetTextPrefferdSize( _parent, _path );
                         translator.PushUnityEngineVector2(L, gen_ret);
                     
                     
@@ -5832,7 +5832,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Material gen_ret = CommonUtil.GetMeshSharedMaterial( _parent, _path );
+                        var gen_ret = CommonUtil.GetMeshSharedMaterial( _parent, _path );
                         translator.Push(L, gen_ret);
                     
                     
@@ -5861,7 +5861,7 @@ namespace XLua.CSObjectWrap
                     string _path = LuaAPI.lua_tostring(L, 2);
                     int _index = LuaAPI.xlua_tointeger(L, 3);
                     
-                        float gen_ret = CommonUtil.GetAnimationLength( _parent, _path, _index );
+                        var gen_ret = CommonUtil.GetAnimationLength( _parent, _path, _index );
                         LuaAPI.lua_pushnumber(L, gen_ret);
                     
                     
@@ -6084,7 +6084,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        int gen_ret = CommonUtil.GetNowMilliseconds(  );
+                        var gen_ret = CommonUtil.GetNowMilliseconds(  );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
@@ -6109,7 +6109,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _str = LuaAPI.lua_tostring(L, 1);
                     
-                        bool gen_ret = CommonUtil.IsNullOrEmpty( _str );
+                        var gen_ret = CommonUtil.IsNullOrEmpty( _str );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -6133,7 +6133,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = CommonUtil.IsAndroid(  );
+                        var gen_ret = CommonUtil.IsAndroid(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -6157,7 +6157,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = CommonUtil.IsIPhone(  );
+                        var gen_ret = CommonUtil.IsIPhone(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -6181,7 +6181,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = CommonUtil.IsIOS(  );
+                        var gen_ret = CommonUtil.IsIOS(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -6205,7 +6205,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        string gen_ret = CommonUtil.GetPlatformName(  );
+                        var gen_ret = CommonUtil.GetPlatformName(  );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -6256,7 +6256,7 @@ namespace XLua.CSObjectWrap
                     string _key = LuaAPI.lua_tostring(L, 1);
                     string _defaultValue = LuaAPI.lua_tostring(L, 2);
                     
-                        string gen_ret = CommonUtil.GetLocalData( _key, _defaultValue );
+                        var gen_ret = CommonUtil.GetLocalData( _key, _defaultValue );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -6307,7 +6307,7 @@ namespace XLua.CSObjectWrap
                     string _key = LuaAPI.lua_tostring(L, 1);
                     int _defaultValue = LuaAPI.xlua_tointeger(L, 2);
                     
-                        int gen_ret = CommonUtil.GetLocalDataInt( _key, _defaultValue );
+                        var gen_ret = CommonUtil.GetLocalDataInt( _key, _defaultValue );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
@@ -6358,7 +6358,7 @@ namespace XLua.CSObjectWrap
                     string _key = LuaAPI.lua_tostring(L, 1);
                     float _defaultValue = (float)LuaAPI.lua_tonumber(L, 2);
                     
-                        float gen_ret = CommonUtil.GetLocalDataFloat( _key, _defaultValue );
+                        var gen_ret = CommonUtil.GetLocalDataFloat( _key, _defaultValue );
                         LuaAPI.lua_pushnumber(L, gen_ret);
                     
                     
@@ -6409,7 +6409,7 @@ namespace XLua.CSObjectWrap
                     string _key = LuaAPI.lua_tostring(L, 1);
                     bool _defaultValue = LuaAPI.lua_toboolean(L, 2);
                     
-                        bool gen_ret = CommonUtil.GetLocalDataBool( _key, _defaultValue );
+                        var gen_ret = CommonUtil.GetLocalDataBool( _key, _defaultValue );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -6433,7 +6433,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        string gen_ret = CommonUtil.GetTimeStamp(  );
+                        var gen_ret = CommonUtil.GetTimeStamp(  );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -6457,7 +6457,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        string gen_ret = CommonUtil.GetDateStamp(  );
+                        var gen_ret = CommonUtil.GetDateStamp(  );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -6481,7 +6481,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        string gen_ret = CommonUtil.GetDateTimeStamp(  );
+                        var gen_ret = CommonUtil.GetDateTimeStamp(  );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -6532,7 +6532,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = CommonUtil.ReadFile( _path );
+                        var gen_ret = CommonUtil.ReadFile( _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -6560,7 +6560,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        float gen_ret = CommonUtil.GetUIWidth( _parent, _path );
+                        var gen_ret = CommonUtil.GetUIWidth( _parent, _path );
                         LuaAPI.lua_pushnumber(L, gen_ret);
                     
                     
@@ -6588,7 +6588,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        float gen_ret = CommonUtil.GetUIHeight( _parent, _path );
+                        var gen_ret = CommonUtil.GetUIHeight( _parent, _path );
                         LuaAPI.lua_pushnumber(L, gen_ret);
                     
                     
@@ -6616,7 +6616,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Object _parent = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.Vector2 gen_ret = CommonUtil.GetUISize( _parent, _path );
+                        var gen_ret = CommonUtil.GetUISize( _parent, _path );
                         translator.PushUnityEngineVector2(L, gen_ret);
                     
                     
@@ -7097,7 +7097,7 @@ namespace XLua.CSObjectWrap
                     float _b = (float)LuaAPI.lua_tonumber(L, 2);
                     float _maxDelta = (float)LuaAPI.lua_tonumber(L, 3);
                     
-                        bool gen_ret = CommonUtil.Approximately( _a, _b, _maxDelta );
+                        var gen_ret = CommonUtil.Approximately( _a, _b, _maxDelta );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -7124,7 +7124,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _hex = LuaAPI.lua_tostring(L, 1);
                     
-                        float[] gen_ret = CommonUtil.ColorHexToRGBA( _hex );
+                        var gen_ret = CommonUtil.ColorHexToRGBA( _hex );
                         translator.Push(L, gen_ret);
                     
                     
@@ -7152,7 +7152,7 @@ namespace XLua.CSObjectWrap
                     float _b = (float)LuaAPI.lua_tonumber(L, 3);
                     float _a = (float)LuaAPI.lua_tonumber(L, 4);
                     
-                        string gen_ret = CommonUtil.ColorRGBAToHex( _r, _g, _b, _a );
+                        var gen_ret = CommonUtil.ColorRGBAToHex( _r, _g, _b, _a );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -7180,7 +7180,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Vector2 _a;translator.Get(L, 1, out _a);
                     UnityEngine.Vector2 _b;translator.Get(L, 2, out _b);
                     
-                        float gen_ret = CommonUtil.Vect2Distance( _a, _b );
+                        var gen_ret = CommonUtil.Vect2Distance( _a, _b );
                         LuaAPI.lua_pushnumber(L, gen_ret);
                     
                     
@@ -7208,7 +7208,7 @@ namespace XLua.CSObjectWrap
                     UnityEngine.Vector3 _a;translator.Get(L, 1, out _a);
                     UnityEngine.Vector3 _b;translator.Get(L, 2, out _b);
                     
-                        float gen_ret = CommonUtil.Vect3Distance( _a, _b );
+                        var gen_ret = CommonUtil.Vect3Distance( _a, _b );
                         LuaAPI.lua_pushnumber(L, gen_ret);
                     
                     
@@ -7236,7 +7236,7 @@ namespace XLua.CSObjectWrap
                     System.Collections.IEnumerable _list = (System.Collections.IEnumerable)translator.GetObject(L, 1, typeof(System.Collections.IEnumerable));
                     string _seperator = LuaAPI.lua_tostring(L, 2);
                     
-                        string gen_ret = CommonUtil.Join( _list, _seperator );
+                        var gen_ret = CommonUtil.Join( _list, _seperator );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     

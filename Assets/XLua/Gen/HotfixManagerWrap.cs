@@ -76,7 +76,7 @@ namespace XLua.CSObjectWrap
 				if(LuaAPI.lua_gettop(L) == 1)
 				{
 					
-					HotfixManager gen_ret = new HotfixManager();
+					var gen_ret = new HotfixManager();
 					translator.Push(L, gen_ret);
                     
 					return 1;
@@ -215,7 +215,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        UnityEngine.AssetBundleManifest gen_ret = gen_to_be_invoked.GetManifest(  );
+                        var gen_ret = gen_to_be_invoked.GetManifest(  );
                         translator.Push(L, gen_ret);
                     
                     
@@ -244,7 +244,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _assetPath = LuaAPI.lua_tostring(L, 2);
                     
-                        string gen_ret = gen_to_be_invoked.GetCacheGroup( _assetPath );
+                        var gen_ret = gen_to_be_invoked.GetCacheGroup( _assetPath );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -274,7 +274,7 @@ namespace XLua.CSObjectWrap
                     string _path = LuaAPI.lua_tostring(L, 2);
                     System.Type _type = (System.Type)translator.GetObject(L, 3, typeof(System.Type));
                     
-                        UnityEngine.Object gen_ret = gen_to_be_invoked.LoadResource( _path, _type );
+                        var gen_ret = gen_to_be_invoked.LoadResource( _path, _type );
                         translator.Push(L, gen_ret);
                     
                     
@@ -305,7 +305,7 @@ namespace XLua.CSObjectWrap
                     System.Type _type = (System.Type)translator.GetObject(L, 3, typeof(System.Type));
                     System.Action<UnityEngine.Object, string> _callback = translator.GetDelegate<System.Action<UnityEngine.Object, string>>(L, 4);
                     
-                        string gen_ret = gen_to_be_invoked.LoadResourceAsyncQueue( _path, _type, _callback );
+                        var gen_ret = gen_to_be_invoked.LoadResourceAsyncQueue( _path, _type, _callback );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -334,7 +334,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _sceneName = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.AssetBundle gen_ret = gen_to_be_invoked.BeforeLoadScene( _sceneName );
+                        var gen_ret = gen_to_be_invoked.BeforeLoadScene( _sceneName );
                         translator.Push(L, gen_ret);
                     
                     
@@ -394,7 +394,7 @@ namespace XLua.CSObjectWrap
                     bool _addCounter = LuaAPI.lua_toboolean(L, 3);
                     System.Action<UnityEngine.GameObject, string> _callback = translator.GetDelegate<System.Action<UnityEngine.GameObject, string>>(L, 4);
                     
-                        System.Collections.IEnumerator gen_ret = gen_to_be_invoked.LoadPrefabAsync( _path, _addCounter, _callback );
+                        var gen_ret = gen_to_be_invoked.LoadPrefabAsync( _path, _addCounter, _callback );
                         translator.PushAny(L, gen_ret);
                     
                     
@@ -453,7 +453,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        UnityEngine.GameObject gen_ret = gen_to_be_invoked.CreatePrefab( _path );
+                        var gen_ret = gen_to_be_invoked.CreatePrefab( _path );
                         translator.Push(L, gen_ret);
                     
                     
@@ -483,7 +483,7 @@ namespace XLua.CSObjectWrap
                     string _path = LuaAPI.lua_tostring(L, 2);
                     System.Action<UnityEngine.GameObject> _callback = translator.GetDelegate<System.Action<UnityEngine.GameObject>>(L, 3);
                     
-                        System.Collections.IEnumerator gen_ret = gen_to_be_invoked.CreatePrefabAsync( _path, _callback );
+                        var gen_ret = gen_to_be_invoked.CreatePrefabAsync( _path, _callback );
                         translator.PushAny(L, gen_ret);
                     
                     
@@ -512,7 +512,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _bundleName = LuaAPI.lua_tostring(L, 2);
                     
-                        bool gen_ret = gen_to_be_invoked.IsCommonBundle( _bundleName );
+                        var gen_ret = gen_to_be_invoked.IsCommonBundle( _bundleName );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -541,7 +541,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _bundleName = LuaAPI.lua_tostring(L, 2);
                     
-                        string[] gen_ret = gen_to_be_invoked.GetAllDependencies( _bundleName );
+                        var gen_ret = gen_to_be_invoked.GetAllDependencies( _bundleName );
                         translator.Push(L, gen_ret);
                     
                     
@@ -626,7 +626,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 2);
                     
-                        string gen_ret = gen_to_be_invoked.GetBundleByAssetPath( _path );
+                        var gen_ret = gen_to_be_invoked.GetBundleByAssetPath( _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     

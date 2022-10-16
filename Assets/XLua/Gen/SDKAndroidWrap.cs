@@ -50,7 +50,7 @@ namespace XLua.CSObjectWrap
 				if(LuaAPI.lua_gettop(L) == 1)
 				{
 					
-					SDKAndroid gen_ret = new SDKAndroid();
+					var gen_ret = new SDKAndroid();
 					translator.Push(L, gen_ret);
                     
 					return 1;

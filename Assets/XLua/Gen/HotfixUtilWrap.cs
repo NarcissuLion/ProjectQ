@@ -103,7 +103,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _filePath = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = HotfixUtil.GetManifestHash( _filePath );
+                        var gen_ret = HotfixUtil.GetManifestHash( _filePath );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -129,7 +129,7 @@ namespace XLua.CSObjectWrap
                     string _assetBundleRoot = LuaAPI.lua_tostring(L, 1);
                     string _filePath = LuaAPI.lua_tostring(L, 2);
                     
-                        string gen_ret = HotfixUtil.BundleFilePathToBundleName( _assetBundleRoot, _filePath );
+                        var gen_ret = HotfixUtil.BundleFilePathToBundleName( _assetBundleRoot, _filePath );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -154,7 +154,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = HotfixUtil.FilePathToAssetPath( _path );
+                        var gen_ret = HotfixUtil.FilePathToAssetPath( _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -179,7 +179,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _assetPath = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = HotfixUtil.AssetPathToFilePath( _assetPath );
+                        var gen_ret = HotfixUtil.AssetPathToFilePath( _assetPath );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -204,7 +204,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = HotfixUtil.NormalizePath( _path );
+                        var gen_ret = HotfixUtil.NormalizePath( _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -230,7 +230,7 @@ namespace XLua.CSObjectWrap
                     string _a = LuaAPI.lua_tostring(L, 1);
                     string _b = LuaAPI.lua_tostring(L, 2);
                     
-                        string gen_ret = HotfixUtil.CompareVersion( _a, _b );
+                        var gen_ret = HotfixUtil.CompareVersion( _a, _b );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -255,7 +255,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _version = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = HotfixUtil.VersionToDirName( _version );
+                        var gen_ret = HotfixUtil.VersionToDirName( _version );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -280,7 +280,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _versionName = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = HotfixUtil.DirNameToVersion( _versionName );
+                        var gen_ret = HotfixUtil.DirNameToVersion( _versionName );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -389,7 +389,7 @@ namespace XLua.CSObjectWrap
                     HotfixList _preChangeList = (HotfixList)translator.GetObject(L, 4, typeof(HotfixList));
                     string _md5 = LuaAPI.lua_tostring(L, 5);
                     
-                        bool gen_ret = HotfixUtil.IsBundleDifferent( _bundleName, _preHashList, _curHashList, _preChangeList, _md5 );
+                        var gen_ret = HotfixUtil.IsBundleDifferent( _bundleName, _preHashList, _curHashList, _preChangeList, _md5 );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -418,7 +418,7 @@ namespace XLua.CSObjectWrap
                     string _md5 = LuaAPI.lua_tostring(L, 2);
                     HotfixList _preList = (HotfixList)translator.GetObject(L, 3, typeof(HotfixList));
                     
-                        bool gen_ret = HotfixUtil.IsFileDifferent( _name, _md5, _preList );
+                        var gen_ret = HotfixUtil.IsFileDifferent( _name, _md5, _preList );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -447,7 +447,7 @@ namespace XLua.CSObjectWrap
                     HotfixList _preList = (HotfixList)translator.GetObject(L, 2, typeof(HotfixList));
                     bool _different = LuaAPI.lua_toboolean(L, 3);
                     
-                        int gen_ret = HotfixUtil.GetCurFileVersion( _name, _preList, _different );
+                        var gen_ret = HotfixUtil.GetCurFileVersion( _name, _preList, _different );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
@@ -501,7 +501,7 @@ namespace XLua.CSObjectWrap
                     string _filePath = LuaAPI.lua_tostring(L, 1);
                     int _fileLevel = LuaAPI.xlua_tointeger(L, 2);
                     
-                        int gen_ret = HotfixUtil.GetZipFileCount( _filePath, _fileLevel );
+                        var gen_ret = HotfixUtil.GetZipFileCount( _filePath, _fileLevel );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
@@ -512,7 +512,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _filePath = LuaAPI.lua_tostring(L, 1);
                     
-                        int gen_ret = HotfixUtil.GetZipFileCount( _filePath );
+                        var gen_ret = HotfixUtil.GetZipFileCount( _filePath );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
@@ -544,7 +544,7 @@ namespace XLua.CSObjectWrap
                     System.IO.Stream _stream = (System.IO.Stream)translator.GetObject(L, 1, typeof(System.IO.Stream));
                     int _fileLevel = LuaAPI.xlua_tointeger(L, 2);
                     
-                        int gen_ret = HotfixUtil.GetZipStreamFileCount( _stream, _fileLevel );
+                        var gen_ret = HotfixUtil.GetZipStreamFileCount( _stream, _fileLevel );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
@@ -555,7 +555,7 @@ namespace XLua.CSObjectWrap
                 {
                     System.IO.Stream _stream = (System.IO.Stream)translator.GetObject(L, 1, typeof(System.IO.Stream));
                     
-                        int gen_ret = HotfixUtil.GetZipStreamFileCount( _stream );
+                        var gen_ret = HotfixUtil.GetZipStreamFileCount( _stream );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
@@ -659,7 +659,7 @@ namespace XLua.CSObjectWrap
                     long _a = LuaAPI.lua_toint64(L, 1);
                     long _b = LuaAPI.lua_toint64(L, 2);
                     
-                        long gen_ret = HotfixUtil.Min( _a, _b );
+                        var gen_ret = HotfixUtil.Min( _a, _b );
                         LuaAPI.lua_pushint64(L, gen_ret);
                     
                     
@@ -684,7 +684,7 @@ namespace XLua.CSObjectWrap
                 {
                     byte[] _b = LuaAPI.lua_tobytes(L, 1);
                     
-                        int gen_ret = HotfixUtil.BytesToLength( _b );
+                        var gen_ret = HotfixUtil.BytesToLength( _b );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
@@ -709,7 +709,7 @@ namespace XLua.CSObjectWrap
                 {
                     int _a = LuaAPI.xlua_tointeger(L, 1);
                     
-                        byte[] gen_ret = HotfixUtil.LengthToBytes( _a );
+                        var gen_ret = HotfixUtil.LengthToBytes( _a );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -733,7 +733,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        string gen_ret = HotfixUtil.GetBackupName(  );
+                        var gen_ret = HotfixUtil.GetBackupName(  );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -757,7 +757,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        string gen_ret = HotfixUtil.GetBackupPath(  );
+                        var gen_ret = HotfixUtil.GetBackupPath(  );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -781,7 +781,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        string gen_ret = HotfixUtil.BackupCurHotfix(  );
+                        var gen_ret = HotfixUtil.BackupCurHotfix(  );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -805,7 +805,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        string gen_ret = HotfixUtil.RevertHotfixBackup(  );
+                        var gen_ret = HotfixUtil.RevertHotfixBackup(  );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -900,7 +900,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        HotfixUtil.DecompressOption gen_ret = HotfixUtil.NeedDecompressResource(  );
+                        var gen_ret = HotfixUtil.NeedDecompressResource(  );
                         translator.Push(L, gen_ret);
                     
                     

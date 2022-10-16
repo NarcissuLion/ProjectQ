@@ -14,10 +14,10 @@ end
 
 function Timer.UpdateAll(deltaTime)
     for i = #allTimers, 1, -1 do
-        if not allTimers[i].killed then
+        if allTimers[i].running then
             allTimers[i]:Update(deltaTime)
         end
-        if allTimers[i].killed then
+        if not allTimers[i].running then
             table.remove(allTimers, i)
         end
     end
@@ -28,17 +28,22 @@ function Timer:Init(interval, loopTimes, callback)
     self.loopTimes = loopTimes
     self.callback = callback
     self:Reset()
-    table.insert(allTimers, self)
+    self.running = false
 end
 
 function Timer:Reset()
     self.timer = 0
     self.counter = 0
-    self.killed = false
 end
 
-function Timer:Kill()
-    self.killed = true
+function Timer:Play()
+    if self.running then return end
+    table.insert(allTimers, self)
+    self.running = true
+end
+
+function Timer:Stop()
+    self.running = false
 end
 
 function Timer:Update(deltaTime)
@@ -47,7 +52,7 @@ function Timer:Update(deltaTime)
         self.counter = self.counter + 1
         self.timer = self.timer - self.interval
         if self.loopTimes > 0 and self.counter >= self.loopTimes then
-            self:Kill()
+            self:Stop()
         end
         self.callback(self.counter)
     end

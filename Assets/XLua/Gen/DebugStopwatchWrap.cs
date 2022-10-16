@@ -56,7 +56,7 @@ namespace XLua.CSObjectWrap
 				if(LuaAPI.lua_gettop(L) == 1)
 				{
 					
-					DebugStopwatch gen_ret = new DebugStopwatch();
+					var gen_ret = new DebugStopwatch();
 					translator.Push(L, gen_ret);
                     
 					return 1;
@@ -136,7 +136,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _label = LuaAPI.lua_tostring(L, 1);
                     
-                        float gen_ret = DebugStopwatch.GetStopElapsed( _label );
+                        var gen_ret = DebugStopwatch.GetStopElapsed( _label );
                         LuaAPI.lua_pushnumber(L, gen_ret);
                     
                     

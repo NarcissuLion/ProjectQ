@@ -75,7 +75,7 @@ namespace XLua.CSObjectWrap
 				if(LuaAPI.lua_gettop(L) == 1)
 				{
 					
-					GridView gen_ret = new GridView();
+					var gen_ret = new GridView();
 					translator.Push(L, gen_ret);
                     
 					return 1;
@@ -276,7 +276,7 @@ namespace XLua.CSObjectWrap
                 {
                     int _index = LuaAPI.xlua_tointeger(L, 2);
                     
-                        UnityEngine.GameObject gen_ret = gen_to_be_invoked.GetItem( _index );
+                        var gen_ret = gen_to_be_invoked.GetItem( _index );
                         translator.Push(L, gen_ret);
                     
                     

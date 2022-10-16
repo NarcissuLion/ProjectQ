@@ -3,7 +3,7 @@ TopUI = {}
 TopUI.__index = TopUI
 
 function TopUI:Create()
-    self.root = GameUtil.CreatePrefab("Prefab/UI/Battle/TopUI")
+    self.root = GameUtil.CreatePrefab("Prefab/UI/Battle/TopUI_2")
     ViewManager:AddToTopCanvas(self.root , true)
     self:AddListener()
     return self

@@ -66,7 +66,7 @@ namespace XLua.CSObjectWrap
 				if(LuaAPI.lua_gettop(L) == 1)
 				{
 					
-					HttpManager gen_ret = new HttpManager();
+					var gen_ret = new HttpManager();
 					translator.Push(L, gen_ret);
                     
 					return 1;
@@ -99,7 +99,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        HttpManager gen_ret = HttpManager.GetInstance(  );
+                        var gen_ret = HttpManager.GetInstance(  );
                         translator.Push(L, gen_ret);
                     
                     

@@ -20,7 +20,7 @@ function ActorAIState:OnEnter()
     self.hero = self.battle.nowActionHero
     AsyncCall(function ()
         self:DoAI(self.hero)
-    end,1)
+    end,2)
 end
 
 function ActorAIState:Dispose()

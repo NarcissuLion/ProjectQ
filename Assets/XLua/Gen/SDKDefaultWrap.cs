@@ -50,7 +50,7 @@ namespace XLua.CSObjectWrap
 				if(LuaAPI.lua_gettop(L) == 1)
 				{
 					
-					SDKDefault gen_ret = new SDKDefault();
+					var gen_ret = new SDKDefault();
 					translator.Push(L, gen_ret);
                     
 					return 1;

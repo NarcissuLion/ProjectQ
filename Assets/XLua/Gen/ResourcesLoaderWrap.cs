@@ -78,7 +78,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 1);
                     
-                        bool gen_ret = ResourcesLoader.ExistsFromStreamingAssets( _path );
+                        var gen_ret = ResourcesLoader.ExistsFromStreamingAssets( _path );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -103,7 +103,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 1);
                     
-                        bool gen_ret = ResourcesLoader.ExistsFromPersistentData( _path );
+                        var gen_ret = ResourcesLoader.ExistsFromPersistentData( _path );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -128,7 +128,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 1);
                     
-                        byte[] gen_ret = ResourcesLoader.LoadBytesFromStreamingAssets( _path );
+                        var gen_ret = ResourcesLoader.LoadBytesFromStreamingAssets( _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -153,7 +153,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 1);
                     
-                        byte[] gen_ret = ResourcesLoader.LoadBytesFromPersistentData( _path );
+                        var gen_ret = ResourcesLoader.LoadBytesFromPersistentData( _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -178,7 +178,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 1);
                     
-                        byte[] gen_ret = ResourcesLoader.LoadBytesFromResource( _path );
+                        var gen_ret = ResourcesLoader.LoadBytesFromResource( _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -203,7 +203,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = ResourcesLoader.LoadTextFromStreamingAssets( _path );
+                        var gen_ret = ResourcesLoader.LoadTextFromStreamingAssets( _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -228,7 +228,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = ResourcesLoader.LoadTextFromPersistentData( _path );
+                        var gen_ret = ResourcesLoader.LoadTextFromPersistentData( _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -253,7 +253,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _path = LuaAPI.lua_tostring(L, 1);
                     
-                        string gen_ret = ResourcesLoader.LoadTextFromResource( _path );
+                        var gen_ret = ResourcesLoader.LoadTextFromResource( _path );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -281,7 +281,7 @@ namespace XLua.CSObjectWrap
                     string _path = LuaAPI.lua_tostring(L, 1);
                     System.Type _type = (System.Type)translator.GetObject(L, 2, typeof(System.Type));
                     
-                        UnityEngine.Object gen_ret = ResourcesLoader.Load( _path, _type );
+                        var gen_ret = ResourcesLoader.Load( _path, _type );
                         translator.Push(L, gen_ret);
                     
                     
@@ -308,7 +308,7 @@ namespace XLua.CSObjectWrap
                 {
                     string _resType = LuaAPI.lua_tostring(L, 1);
                     
-                        System.Type gen_ret = ResourcesLoader.GetAssemblyType( _resType );
+                        var gen_ret = ResourcesLoader.GetAssemblyType( _resType );
                         translator.Push(L, gen_ret);
                     
                     
@@ -336,7 +336,7 @@ namespace XLua.CSObjectWrap
                     string _path = LuaAPI.lua_tostring(L, 1);
                     string _resType = LuaAPI.lua_tostring(L, 2);
                     
-                        object gen_ret = ResourcesLoader.LoadFromResource( _path, _resType );
+                        var gen_ret = ResourcesLoader.LoadFromResource( _path, _resType );
                         translator.PushAny(L, gen_ret);
                     
                     

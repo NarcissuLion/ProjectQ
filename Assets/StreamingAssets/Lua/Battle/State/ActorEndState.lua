@@ -1,4 +1,5 @@
 local FSMachine = require 'Framework.FSMachine'
+local Timer = require 'Framework.Timer'
 ActorEndState = {}
 ActorEndState.__index = ActorEndState
 setmetatable(ActorEndState, FSMachine.State)
@@ -19,8 +20,15 @@ end
 function ActorEndState:OnEnter()
     self.hero = self.battle.nowActionHero
     self.hero:OnActionEnd()
-    -- todoUpdate
-    self.battle:ChangeState(BattleState.Round)
+
+    -- add by lvfeng. 暂时在这里加一点时间来缓冲一下回合间节奏
+    if self.delayTimer == nil then
+        self.delayTimer = Timer.Create(2, 1, function()
+            -- todoUpdate
+            self.battle:ChangeState(BattleState.Round)
+        end)
+    end
+    self.delayTimer:Play()
 end
 
 function ActorEndState:Dispose()

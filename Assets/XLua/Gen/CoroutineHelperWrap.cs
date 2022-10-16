@@ -59,7 +59,7 @@ namespace XLua.CSObjectWrap
 				if(LuaAPI.lua_gettop(L) == 1)
 				{
 					
-					CoroutineHelper gen_ret = new CoroutineHelper();
+					var gen_ret = new CoroutineHelper();
 					translator.Push(L, gen_ret);
                     
 					return 1;
@@ -93,7 +93,7 @@ namespace XLua.CSObjectWrap
                 {
                     UnityEngine.Object _obj = (UnityEngine.Object)translator.GetObject(L, 1, typeof(UnityEngine.Object));
                     
-                        CoroutineHelper gen_ret = CoroutineHelper.GetInstance( _obj );
+                        var gen_ret = CoroutineHelper.GetInstance( _obj );
                         translator.Push(L, gen_ret);
                     
                     
@@ -177,7 +177,7 @@ namespace XLua.CSObjectWrap
                 {
                     CoroutineHelper.Task _task = translator.GetDelegate<CoroutineHelper.Task>(L, 2);
                     
-                        UnityEngine.Coroutine gen_ret = gen_to_be_invoked.ExcuteTask( _task );
+                        var gen_ret = gen_to_be_invoked.ExcuteTask( _task );
                         translator.Push(L, gen_ret);
                     
                     
@@ -206,7 +206,7 @@ namespace XLua.CSObjectWrap
                 {
                     CoroutineHelper.Task _task = translator.GetDelegate<CoroutineHelper.Task>(L, 2);
                     
-                        UnityEngine.Coroutine gen_ret = gen_to_be_invoked.WaitForEndOfFrame( _task );
+                        var gen_ret = gen_to_be_invoked.WaitForEndOfFrame( _task );
                         translator.Push(L, gen_ret);
                     
                     
@@ -236,7 +236,7 @@ namespace XLua.CSObjectWrap
                     float _delay = (float)LuaAPI.lua_tonumber(L, 2);
                     CoroutineHelper.Task _task = translator.GetDelegate<CoroutineHelper.Task>(L, 3);
                     
-                        UnityEngine.Coroutine gen_ret = gen_to_be_invoked.WaitForSeconds( _delay, _task );
+                        var gen_ret = gen_to_be_invoked.WaitForSeconds( _delay, _task );
                         translator.Push(L, gen_ret);
                     
                     

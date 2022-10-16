@@ -24,8 +24,12 @@ function ActorStartState:OnEnter()
     self.hero:OnActionStart()
     -- todoUpdate
     if self.hero.isOwn then
+        -- add by lvfeng, 先按DD2的运镜来点意思
+        Notifier.Dispatch("CameraFocusLeft")
         self.battle:ChangeState(BattleState.ActorInput)
     else
+        -- add by lvfeng, 先按DD2的运镜来点意思
+        Notifier.Dispatch("CameraFocusRight")
         self.battle:ChangeState(BattleState.ActorAI)
     end
 end

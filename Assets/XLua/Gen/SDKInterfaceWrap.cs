@@ -209,7 +209,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = gen_to_be_invoked.Logout(  );
+                        var gen_ret = gen_to_be_invoked.Logout(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -237,7 +237,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = gen_to_be_invoked.IsLogin(  );
+                        var gen_ret = gen_to_be_invoked.IsLogin(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -321,7 +321,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = gen_to_be_invoked.ShowAccountCenter(  );
+                        var gen_ret = gen_to_be_invoked.ShowAccountCenter(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -377,7 +377,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = gen_to_be_invoked.IsSupportLogin(  );
+                        var gen_ret = gen_to_be_invoked.IsSupportLogin(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -405,7 +405,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = gen_to_be_invoked.IsSupportPay(  );
+                        var gen_ret = gen_to_be_invoked.IsSupportPay(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -433,7 +433,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = gen_to_be_invoked.IsSupportStat(  );
+                        var gen_ret = gen_to_be_invoked.IsSupportStat(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -461,7 +461,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = gen_to_be_invoked.IsSupportExit(  );
+                        var gen_ret = gen_to_be_invoked.IsSupportExit(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -489,7 +489,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = gen_to_be_invoked.IsSupportAccountCenter(  );
+                        var gen_ret = gen_to_be_invoked.IsSupportAccountCenter(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -517,7 +517,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = gen_to_be_invoked.IsSupportLogout(  );
+                        var gen_ret = gen_to_be_invoked.IsSupportLogout(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -545,7 +545,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        string gen_ret = gen_to_be_invoked.GetNetworkOperatorName(  );
+                        var gen_ret = gen_to_be_invoked.GetNetworkOperatorName(  );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -573,7 +573,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        string gen_ret = gen_to_be_invoked.GetMacAddr(  );
+                        var gen_ret = gen_to_be_invoked.GetMacAddr(  );
                         LuaAPI.lua_pushstring(L, gen_ret);
                     
                     
@@ -601,7 +601,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        bool gen_ret = gen_to_be_invoked.IsSDKEnv(  );
+                        var gen_ret = gen_to_be_invoked.IsSDKEnv(  );
                         LuaAPI.lua_pushboolean(L, gen_ret);
                     
                     
@@ -629,7 +629,7 @@ namespace XLua.CSObjectWrap
                 
                 {
                     
-                        int gen_ret = gen_to_be_invoked.GetChannelID(  );
+                        var gen_ret = gen_to_be_invoked.GetChannelID(  );
                         LuaAPI.xlua_pushinteger(L, gen_ret);
                     
                     
