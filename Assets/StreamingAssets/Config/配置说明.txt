@@ -1,0 +1,31 @@
+注意json的配置格式，每一项的最后一行不要有逗号
+
+
+
+Hero：为英雄列表
+key:英雄的唯一标识
+value：
+	name显示用的名字
+	prefab：对应GameAssets/SpriteAssets/Character里的预设名字
+	hp：血
+	atk：攻
+	spd：速
+	vol：占用体积，目前只支持1,2
+	skill：对应skill表中的技能
+	
+	
+	
+Skill：为技能列表
+key:技能的唯一标识
+value：
+	typ:技能类型 atk：攻击  cure：治疗 special：特殊 buff：状态
+	name显示用的名字
+	atkPos:射程， 没有射程的填[0]
+	cd:冷却
+	dmg：伤害区间
+	range：作用范围 one：单体 all 全体 aoe：范围 own：自己
+	
+	
+	
+TestBttle：为战斗人物表
+按照站位填写Hero表中对应的id，没有人的情况填-1，有大体积英雄只有他所在的位置填写id，体积占的位置填-1
