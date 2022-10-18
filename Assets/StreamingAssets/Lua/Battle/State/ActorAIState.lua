@@ -43,7 +43,6 @@ function ActorAIState:DoAI(heroData)
             self.hero.skillCD[skillIndex] = skillConfig.cd + 1
         end
         local atkPos = self:RandomAtkPos(skillId , heroData.pos)
-        printJson(atkPos)
         self.battle:ChangeState(BattleState.ActorAction , skillId , atkPos)
     else
         self.battle:ChangeState(BattleState.ActorEnd)
@@ -57,7 +56,9 @@ function ActorAIState:RandomEnemyAction(heroData)
     for index, value in ipairs(heroSkill) do
         table.insert(skills , value)
     end
-    for index, skillId in ipairs(skills) do
+    while heroSkill ~= nil do
+        local index = math.random(1 , #heroSkill)
+        local skillId = heroSkill[index]
         local skillConfig = ConfigManager:GetConfig("Skill")
         skillConfig = skillConfig[skillId]
         if skillConfig == nil then
@@ -74,18 +75,18 @@ function ActorAIState:RandomEnemyAction(heroData)
             if skillConfig.range == "all" then
                 return skillId , index
             end
-
+            
             if skillConfig.typ == "cure" then
                 for index, pos in ipairs(skillConfig.atkPos) do
                     local truePos = heroData.pos - pos
                     local otherHeroData = self.battle:GetHeroByPos(truePos)
                     if otherHeroData ~= nil and not otherHeroData.isDead and
-                     not otherHeroData.isOwn and not self.battle:HpIsFull(otherHeroData) then
+                    not otherHeroData.isOwn and not self.battle:HpIsFull(otherHeroData) then
                         return skillId , index
                     end
                 end
             end
-        
+            
             --检查被攻击的位置是否有人
             for index, pos in ipairs(skillConfig.atkPos) do
                 local truePos = heroData.pos - pos
@@ -94,7 +95,7 @@ function ActorAIState:RandomEnemyAction(heroData)
                     return skillId , index
                 end
             end
-
+            
             table.remove(skills,index)
         end
     end 

@@ -14,6 +14,7 @@ function TopUI:AddListener()
     Notifier.AddListener("SetOwnInfo",self.SetOwnInfo , self)
     Notifier.AddListener("SetEnemyInfo",self.SetEnemyInfo , self)
     Notifier.AddListener("SetSkillSelect",self.SetSkillSelect , self)
+    Notifier.AddListener("ShowGameOver",self.ShowGameOver , self)
 end
 
 function TopUI:SetRound(index)
@@ -196,4 +197,9 @@ function TopUI:SetSkillSelect(index , skillConfig , nowPos , newPos)
             end
         end
     end
+end
+
+function TopUI:ShowGameOver(isWin)
+    CommonUtil.SetActive(self.root,"Win" , isWin)
+    CommonUtil.SetActive(self.root,"Lose" , not isWin)
 end

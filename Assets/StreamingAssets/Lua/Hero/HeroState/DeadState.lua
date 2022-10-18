@@ -20,6 +20,7 @@ end
 function DeadState:OnEnter()
     self.hero.isDead = true
     Notifier.Dispatch("RefreshHero" , self.hero.pos)
+    Notifier.Dispatch("SetHeroVol" , self.hero.pos , 1)
 end
 
 function DeadState:Dispose()

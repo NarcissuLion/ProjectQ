@@ -37,6 +37,7 @@ function BattleUI:AddListener()
     Notifier.AddListener("ShowDead",self.ShowDead, self)
     Notifier.AddListener("ShowEffectText",self.ShowEffectText, self)
     Notifier.AddListener("ShowBuff1",self.ShowBuff1, self)    
+    Notifier.AddListener("SetHeroVol",self.SetHeroVol, self)    
 end
 
 function BattleUI:CreatePlayer()
@@ -44,6 +45,14 @@ function BattleUI:CreatePlayer()
     for i = 1, 10 do
         self.hero[i] = GameUtil.CreatePrefabToParent("Prefab/Character/Player",parent,i)
         CommonUtil.SetActive(self.hero[i] , nil , false)
+    end
+end
+
+function BattleUI:SetHeroVol(pos , vol)
+    if vol == 1 then
+        CommonUtil.SetlLocalScale(self.hero[pos] , "Img" , Vector3.one)
+    else
+        CommonUtil.SetlLocalScale(self.hero[pos] , "Img" , Vector3.one * 1.5)
     end
 end
 

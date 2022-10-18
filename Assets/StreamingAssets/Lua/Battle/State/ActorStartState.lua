@@ -29,6 +29,9 @@ function ActorStartState:Dispose()
 end
 
 function ActorStartState:OnUpdate()
+    if self.hero then
+        
+    end
     if not self.hero.isPlayAction then
         if self.hero.isOwn then
             -- add by lvfeng, 先按DD2的运镜来点意思

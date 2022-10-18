@@ -38,6 +38,10 @@ function HeroControler:Init(uuid,pos,id,isOwn)
 
     self.isPlayAction = false
 
+    if self.vol ~= 1 then
+        Notifier.Dispatch("SetHeroVol" , self.pos , self.vol)
+    end
+
     self.state = HeroState.IdelState
     self:InitState()
     self:ChangeState(self.state)
@@ -90,7 +94,9 @@ function HeroControler:OnRoundEnd()
         for index, buff in ipairs(self.buff) do
             buff.round = buff.round - 1
             if buff.round <= 0 then
-                if self.buff.name == "buff1" then
+                print("buff" ..  buff.round)
+                print("buff" ..  buff.name)
+                if buff.name == "Buff1" then
                     Notifier.Dispatch("ShowBuff1" , self.hero.pos , false)
                 end
                 self.buff[index] = nil

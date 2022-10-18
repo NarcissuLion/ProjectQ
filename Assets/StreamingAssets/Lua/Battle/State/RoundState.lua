@@ -365,12 +365,12 @@ function RoundState:IsGameOver()
     end
 
     if ownAllDead then
-        print("输了")
+        Notifier.Dispatch("ShowGameOver" , false)
         return true
     end
 
     if enemyAllDead then
-        print("赢了")
+        Notifier.Dispatch("ShowGameOver" , true)
         return true
     end
 
