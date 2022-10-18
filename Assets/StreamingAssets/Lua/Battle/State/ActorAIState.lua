@@ -150,7 +150,7 @@ function ActorAIState:RandomAtkPos(skillId,selfPos)
                 if hero.buff ~= nil  then
                     for index, buff in ipairs(hero.buff) do
                         buff.name = "buff1"
-                        local tmp 
+                        local tmp = {}
                         table.insert(tmp , pos)
                         return tmp
                     end
