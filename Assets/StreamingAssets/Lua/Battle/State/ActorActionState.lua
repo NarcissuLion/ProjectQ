@@ -78,22 +78,20 @@ function ActorActionState:PlaySkillEffect(skillId)
 
         --刷新自己面板
         Notifier.Dispatch("SetOwnInfo" , self.battle:GetHeroData(self.battle.ownInfoUuid))
-    elseif skillId == "b1" then
+    elseif skillId == "b1" or skillId == "warrior_skill2" then
         local text = "嘲讽"
         Notifier.Dispatch("ShowEffectText" , self.hero.pos , text)
         Notifier.Dispatch("ShowBuff1" , self.hero.pos , true)
-        self.hero:SetBuff("Buff1" , 1)
+        self.hero:SetBuff("嘲讽" , 1)
     else
         -- 选中对象
-        local minPos = 8
         for index, p in ipairs(self.atkPos) do
-            Notifier.Dispatch("SetHeroSelect" , p , "Selected")
-        
-            local dmg = self.hero:GetDmg(skillId)                
             local otherHero = self.battle:GetHeroByPos(p)
-            otherHero:ChangeState("HurtState" , dmg)
-            if p<minPos then
-                minPos = p
+            if otherHero~= nil and not otherHero.isDead then
+                Notifier.Dispatch("SetHeroSelect" , p , "Selected")
+            
+                local dmg = self.hero:GetDmg(skillId)                
+                otherHero:ChangeState("HurtState" , dmg)
             end
         end
         --动摄像机

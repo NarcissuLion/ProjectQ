@@ -1,10 +1,106 @@
 {
-"a1":{
+"s1":{
+	"typ":"special",
+	"name":"献祭攻击",
+	"atkPos":[0],
+	"cd":3,
+	"dmg":[100,120],
+	"range":"all"
+},
+"archer_skill1":{
 	"typ":"atk",
-	"name":"近身攻击",
-	"atkPos":[1,2],
+	"name":"常规射击",
+	"atkPos":[3,4,5,6,7,8,9],
 	"cd":0,
 	"dmg":[90,100],
+	"range":"one"
+},
+"archer_skill2":{
+	"typ":"atk",
+	"name":"箭雨",
+	"atkPos":[5,6,7,8,9],
+	"cd":3,
+	"dmg":[50,70],
+	"range":"aoe"
+},
+"wizard_skill1":{
+	"typ":"atk",
+	"name":"火球术",
+	"atkPos":[1,2,3,4,5,6],
+	"cd":0,
+	"dmg":[100,120],
+	"range":"one"
+},
+"wizard_skill2":{
+	"typ":"atk",
+	"name":"陨石术",
+	"atkPos":[1,2,3,4,5,6],
+	"cd":3,
+	"dmg":[60,75],
+	"range":"aoe"
+},
+"doctor_skill1":{
+	"typ":"atk",
+	"name":"惩戒",
+	"atkPos":[1,2,3,4],
+	"cd":0,
+	"dmg":[40,60],
+	"range":"one"
+},
+"doctor_skill2":{
+	"typ":"cure",
+	"name":"治愈",
+	"atkPos":[1,2,3,4],
+	"cd":1,
+	"dmg":[70,80],
+	"range":"one"
+},
+"warrior_skill1":{
+	"typ":"atk",
+	"name":"爪击",
+	"atkPos":[1,2],
+	"cd":0,
+	"dmg":[20,30],
+	"range":"one"
+},
+"warrior_skill2":{
+	"typ":"buff",
+	"name":"嘲讽",
+	"atkPos":[0],
+	"cd":0,
+	"dmg":[0,0],
+	"range":"own"
+},
+"HANFENG_skill1":{
+	"typ":"atk",
+	"name":"单体攻击",
+	"atkPos":[1,2,3,4,5,6,7,8,9],
+	"cd":0,
+	"dmg":[50,100],
+	"range":"one"
+},
+"monster_skill1":{
+	"typ":"atk",
+	"name":"单体攻击",
+	"atkPos":[1,2,3,4,5,6,7,8,9],
+	"cd":0,
+	"dmg":[40,60],
+	"range":"one"
+},
+"player_skill1":{
+	"typ":"atk",
+	"name":"大招？？",
+	"atkPos":[0],
+	"cd":1,
+	"dmg":[40,60],
+	"range":"all"
+},
+"player_skill2":{
+	"typ":"atk",
+	"name":"咸鱼攻击",
+	"atkPos":[1,2,3,4,5,6,7,8,9],
+	"cd":0,
+	"dmg":[20,60],
 	"range":"one"
 },
 "a2":{
@@ -69,14 +165,6 @@
 	"atkPos":[0],
 	"cd":1,
 	"dmg":[5,10],
-	"range":"all"
-},
-"s1":{
-	"typ":"special",
-	"name":"献祭攻击",
-	"atkPos":[0],
-	"cd":3,
-	"dmg":[100,120],
 	"range":"all"
 },
 "b1":{

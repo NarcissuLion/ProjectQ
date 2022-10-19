@@ -327,10 +327,10 @@ function BattleManager:GetNowAtkPos(nowOrderPos , newOrderPos , skillConfig)
     local tmp = {}
     if newOrderPos ~= nil and newOrderPos ~= nowOrderPos then
         local step = newOrderPos - nowOrderPos
-        for index, pos in ipairs(skillConfig.atkPos) do                
+        for index, pos in ipairs(skillConfig.atkPos) do             
             if skillConfig.typ == "cure" then
                 pos = pos - step
-            else
+            elseif skillConfig.typ == "atk" then
                 pos = pos + step
             end
             table.insert(tmp , pos)
@@ -342,10 +342,16 @@ function BattleManager:GetNowAtkPos(nowOrderPos , newOrderPos , skillConfig)
     for index, pos in ipairs(tmp) do
         local truePos = nowOrderPos + pos
         if truePos >= 1 and truePos <= 10 then
-            table.insert(atkPos,truePos)
+            local otherHeroData = self:GetHeroByPos(truePos)
+            if otherHeroData ~= nil and not otherHeroData.isDead then
+                if skillConfig.typ == "cure" and otherHeroData.isOwn then
+                    table.insert(atkPos , truePos)
+                elseif skillConfig.typ == "atk" and not otherHeroData.isOwn then
+                    table.insert(atkPos , truePos)
+                end  
+            end
         end        
     end
-
     return atkPos
 end
 

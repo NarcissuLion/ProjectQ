@@ -29,7 +29,7 @@ function RoundState:OnEnter(orderHero)
         return
     end 
 
-    self:DoNext()
+    
 end
 
 function RoundState:Dispose()
@@ -37,7 +37,13 @@ function RoundState:Dispose()
 end
 
 function RoundState:OnUpdate()
+    for index, hero in ipairs(self.battle.hero) do
+        if hero.isPlayAction then
+            return
+        end        
+    end
 
+    self:DoNext()
 end
 
 function RoundState:OnExit()
@@ -63,6 +69,7 @@ function RoundState:DoNext()
     else
         if self.battle.nowActionHero.isDead then
             self:DoNext()
+            return
         end
         self.battle:ChangeState(BattleState.ActorStart)
     end
