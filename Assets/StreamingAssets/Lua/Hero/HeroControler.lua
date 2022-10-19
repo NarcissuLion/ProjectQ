@@ -96,8 +96,8 @@ function HeroControler:OnRoundEnd()
             if buff.round <= 0 then
                 print("buff" ..  buff.round)
                 print("buff" ..  buff.name)
-                if buff.name == "Buff1" then
-                    Notifier.Dispatch("ShowBuff1" , self.hero.pos , false)
+                if buff.name == "嘲讽" then
+                    Notifier.Dispatch("ShowBuff1" , self.pos , false)
                 end
                 self.buff[index] = nil
             end
