@@ -59,6 +59,7 @@ function BattleManager:CreatePlayer(pos,id,isOwn)
     local posHero = self:GetHeroByPos(pos)
     if posHero ~= nil then
         posHero:Init(self.uuid,pos,id,isOwn)
+        self.hero[self.uuid] = posHero
     else
         self.hero[self.uuid] = HeroControler.Create(self.uuid,pos,id,isOwn)
     end
@@ -67,7 +68,7 @@ function BattleManager:CreatePlayer(pos,id,isOwn)
 end
 function BattleManager:GetHeroData(id)
     for uuid, data in pairs(self.hero) do
-        if uuid == id then
+        if data.uuid == id then
             return data
         end
     end

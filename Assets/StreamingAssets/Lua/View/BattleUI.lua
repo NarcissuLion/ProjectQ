@@ -50,9 +50,12 @@ end
 
 function BattleUI:SetHeroVol(pos , vol)
     if vol == 1 then
-        CommonUtil.SetlLocalScale(self.hero[pos] , "Img" , Vector3.one)
+        CommonUtil.SetlLocalScale(self.hero[pos] , nil , Vector3.one)
+        CommonUtil.SetAnchoredPositionX(self.hero[pos] , nil, 0)
     else
-        CommonUtil.SetlLocalScale(self.hero[pos] , "Img" , Vector3.one * 1.5)
+        --  x-130  scale 1.8
+        CommonUtil.SetlLocalScale(self.hero[pos] , nil , Vector3.one * 1.8)
+        CommonUtil.SetAnchoredPositionX(self.hero[pos] , nil, -130)
     end
 end
 
