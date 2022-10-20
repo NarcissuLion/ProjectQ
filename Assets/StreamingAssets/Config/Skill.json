@@ -4,7 +4,7 @@
 	"name":"献祭攻击",
 	"atkPos":[0],
 	"cd":3,
-	"dmg":[100,120],
+	"dmg":[40,40],
 	"range":"all"
 },
 "archer_skill1":{
@@ -50,7 +50,7 @@
 "doctor_skill2":{
 	"typ":"cure",
 	"name":"治愈",
-	"atkPos":[1,2,3,4],
+	"atkPos":[-4,-3,-2,-1,0,1,2,3,4],
 	"cd":1,
 	"dmg":[70,80],
 	"range":"one"

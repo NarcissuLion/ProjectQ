@@ -56,48 +56,44 @@ function ActorAIState:RandomEnemyAction(heroData)
     for index, value in ipairs(heroSkill) do
         table.insert(skills , value)
     end
-    while heroSkill ~= nil do
-        local index = math.random(1 , #heroSkill)
-        local skillId = heroSkill[index]
+    for index, skillId in ipairs(skills) do
         local skillConfig = ConfigManager:GetConfig("Skill")
         skillConfig = skillConfig[skillId]
         if skillConfig == nil then
             printError("技能" .. skillId .. "表中缺失")
             return
         end
-        if self.hero.skillCD[index] ~= 0 then
-            table.remove(skills,index)
-        end
-        --检查治疗
-        if skillConfig.typ == "cure" and skillConfig.range == "own" and hpIsFull then
-            table.remove(skills,index)
-        else
-            if skillConfig.range == "all" then
-                return skillId , index
-            end
-            
-            if skillConfig.typ == "cure" then
+        if self.hero.skillCD[index] == 0 then
+           --检查治疗
+            if skillConfig.typ == "cure" and skillConfig.range == "own" and hpIsFull then
+                -- table.remove(skills,index)
+            else
+                if skillConfig.range == "all" then
+                    return skillId , index
+                end
+
+                if skillConfig.typ == "cure" then
+                    for index, pos in ipairs(skillConfig.atkPos) do
+                        local truePos = heroData.pos - pos
+                        local otherHeroData = self.battle:GetHeroByPos(truePos)
+                        if otherHeroData ~= nil and not otherHeroData.isDead and
+                        not otherHeroData.isOwn and not self.battle:HpIsFull(otherHeroData) then
+                            return skillId , index
+                        end
+                    end
+                end
+
+                --检查被攻击的位置是否有人
                 for index, pos in ipairs(skillConfig.atkPos) do
                     local truePos = heroData.pos - pos
                     local otherHeroData = self.battle:GetHeroByPos(truePos)
-                    if otherHeroData ~= nil and not otherHeroData.isDead and
-                    not otherHeroData.isOwn and not self.battle:HpIsFull(otherHeroData) then
+                    if otherHeroData ~= nil and not otherHeroData.isDead and otherHeroData.isOwn then
                         return skillId , index
                     end
                 end
             end
-            
-            --检查被攻击的位置是否有人
-            for index, pos in ipairs(skillConfig.atkPos) do
-                local truePos = heroData.pos - pos
-                local otherHeroData = self.battle:GetHeroByPos(truePos)
-                if otherHeroData ~= nil and not otherHeroData.isDead and otherHeroData.isOwn then
-                    return skillId , index
-                end
-            end
-            
-            table.remove(skills,index)
         end
+        -- table.remove(skills,index)
     end 
     return nil
 end

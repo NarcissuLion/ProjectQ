@@ -34,7 +34,7 @@ function HeroControler:Init(uuid,pos,id,isOwn)
     self.vol = heroData.vol
     self.isDead = false
     self.skill = heroData.skill
-    self.skillCD = {0,0,0,0}
+    self.skillCD = heroData.skillcd
 
     self.isPlayAction = false
 
@@ -69,7 +69,10 @@ function HeroControler:OnBattleEnd()
 end
 
 function HeroControler:OnRoundStart()
-    
+    if self.uid == "1" then
+        local text = "吞噬所有小怪，之后对敌方全体造成大量伤害，每吞噬一只伤害提升100%"
+        Notifier.Dispatch("SetBuff2" , self.pos , self.skillCD[1] , text)
+    end
 end
 
 function HeroControler:OnRoundEnd()
@@ -94,8 +97,6 @@ function HeroControler:OnRoundEnd()
         for index, buff in ipairs(self.buff) do
             buff.round = buff.round - 1
             if buff.round <= 0 then
-                print("buff" ..  buff.round)
-                print("buff" ..  buff.name)
                 if buff.name == "嘲讽" then
                     Notifier.Dispatch("ShowBuff1" , self.pos , false)
                 end

@@ -36,8 +36,9 @@ function BattleUI:AddListener()
     Notifier.AddListener("MoveHero",self.MoveHero, self)
     Notifier.AddListener("ShowDead",self.ShowDead, self)
     Notifier.AddListener("ShowEffectText",self.ShowEffectText, self)
-    Notifier.AddListener("ShowBuff1",self.ShowBuff1, self)    
-    Notifier.AddListener("SetHeroVol",self.SetHeroVol, self)    
+    Notifier.AddListener("ShowBuff1",self.ShowBuff1, self)
+    Notifier.AddListener("SetHeroVol",self.SetHeroVol, self)
+    Notifier.AddListener("SetBuff2",self.SetBuff2, self)
 end
 
 function BattleUI:CreatePlayer()
@@ -289,4 +290,27 @@ end
 
 function BattleUI:ShowBuff1(pos , isShow)
     CommonUtil.SetActive(self.hero[pos] , "Buff1" , isShow)
+end
+
+function BattleUI:SetBuff2(pos , cd , text)
+    CommonUtil.SetActive(self.hero[pos] , "Buff2" , pos ~= nil)
+    if pos == nil then
+        return
+    end
+    if cd <= 0 then
+        ImageLoader.SetImage(self.hero[pos], "Buff2/Image" , "Prefab/SpriteAssets/Icon/buff2_co")
+    else
+        ImageLoader.SetImage(self.hero[pos], "Buff2/Image" , "Prefab/SpriteAssets/Icon/buff2_bw")
+    end
+    CommonUtil.SetText(self.hero[pos], "Buff2/Text" , "蓄力：<color=red>"..cd.."</color>回合")
+    CommonUtil.AddButtonClick(self.hero[pos] , "Buff2" , BindFunction(self, self.OnClickBuff2 ,pos , text))
+    CommonUtil.AddButtonClick(self.hero[pos] , "BuffTip" , BindFunction(self, self.OnClickBuff2 , pos ))    
+end
+
+function BattleUI:OnClickBuff2(pos , text)
+    CommonUtil.SetActive(self.hero[pos] , "BuffTip" , text ~= nil)
+    if text == nil then
+        return
+    end
+    CommonUtil.SetText(self.hero[pos] , "BuffTip/Panel/Text" , text)
 end

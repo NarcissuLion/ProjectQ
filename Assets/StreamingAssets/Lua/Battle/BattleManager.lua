@@ -55,12 +55,11 @@ end
 ------------------------------------------------------------
 
 function BattleManager:CreatePlayer(pos,id,isOwn)
-    self.uuid = self.uuid + 1
     local posHero = self:GetHeroByPos(pos)
     if posHero ~= nil then
-        posHero:Init(self.uuid,pos,id,isOwn)
-        self.hero[self.uuid] = posHero
+        posHero:Init(posHero.uuid,pos,id,isOwn)
     else
+        self.uuid = self.uuid + 1
         self.hero[self.uuid] = HeroControler.Create(self.uuid,pos,id,isOwn)
     end
 
